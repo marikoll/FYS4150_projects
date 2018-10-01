@@ -194,8 +194,15 @@ def jacobi(A, epsilon = 1.0E-8):
 
 if __name__ == "__main__":
     
+    
+    ## Used to make matrix, eigenvector, eigenvalues and all we need. Uncomment
+    ## to use.
+    ##_________________________________________________________
+#     A = make_matrix(10, 2, 9)
+#     eigval, eigvec, Amax, teller, time_tot = jacobi(A)
 
-    ## Makes textfile to be used in task 2d! Uncomment to use.
+
+    ## Used to make textfile for comparison in task 2d! Uncomment to use.
     ##_________________________________________________________
 #    list1 = [10, 100, 200,250, 300, 350, 400]
 #    list2 = [5, 6, 7, 8]
@@ -215,18 +222,13 @@ if __name__ == "__main__":
 #        outfile.write('n: {}   Lambda_1: {:.5f}   Lambda_2: {:.5f}   Lambda_3: {:.5f}   Lambda_4: {:.5f}   CPU time: {:.5f} sec    iterations: {}\n'.format(list1[i], eigval[0], eigval[1], eigval[2], eigval[3], time_tot, teller))
 #    outfile.close()
     
-    ## 
-    ##_________________________________________________________
-#     A = make_matrix(10, 2, 9)
-##     eigval_np, teigvec_np = np.linalg.eig(A)
-#     eigval, eigvec, Amax, teller, time_tot = jacobi(A)
+
 
     
-    ##
+    ## Used to make figure for task 2e. Uncomment to use
     ##_________________________________________________________
     omegas = [0, 1, 2, 3]
     omegas1 = [0.01, 0.5, 1,5]
-    # rho_maxes = [60, 8, 5, 8]
     n = 250
     eigvals = np.empty((len(range(n)), len(omegas)))
     plt.figure()
@@ -237,8 +239,6 @@ if __name__ == "__main__":
         eigval, eigvec, amax, t, time_tot = jacobi(A) 
         ind = np.argmin(abs(eigval))
         norm = np.linalg.norm(abs(eigvec[:,ind])**2)
-        
-       # eigvals[i] = min(eigval)
         plt.plot(rhos, (abs(eigvec[:,ind])**2)/norm,  label = 'Omega = {}, ground-state eigenvalue = {:.3f}'.format(omegas1[i], eigval[ind]))
     plt.xlabel('Radial coordinate, rho')
     plt.ylabel('Relative radial wavefunction, |phi(rho)|^2')
@@ -247,17 +247,5 @@ if __name__ == "__main__":
     plt.legend(fontsize = 10)
     plt.savefig('solutions.pdf')
     
-    ##
-    ##_________________________________________________________
-#    A = make_matrix(100, 3, 9, 0)
-#    eigvals, eigvec, amax, t, time_tot = jacobi(A)
-#    plt.plot(eigvec[:,19])
-#    plt.show()
     
-    
-    ## drittgreier:
-    ##_________________________________________________________
-#    V_0 = (3/2)*(0.01/2)**(2/3)
-#    omega_e = m.sqrt(3)*0.01
-#    e_m = V_0 + omega_e*(1/2)
     
