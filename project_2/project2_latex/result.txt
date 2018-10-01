@@ -1,0 +1,5 @@
+n: 10   Lambda_1: 2.919   Lambda_2: 6.583   Lambda_3: 9.937   Lambda_4: 12.916   CPU time: 0.40344 sec    iterations: 131
+n: 100   Lambda_1: 2.999   Lambda_2: 6.996   Lambda_3: 10.991   Lambda_4: 14.987   CPU time: 0.82953 sec    iterations: 16532
+n: 200   Lambda_1: 3.000   Lambda_2: 6.999   Lambda_3: 10.998   Lambda_4: 15.001   CPU time: 3.86054 sec    iterations: 66618
+n: 300   Lambda_1: 3.000   Lambda_2: 7.000   Lambda_3: 10.999   Lambda_4: 15.003   CPU time: 20.81224 sec    iterations: 150728
+n: 400   Lambda_1: 3.000   Lambda_2: 7.000   Lambda_3: 11.000   Lambda_4: 15.004   CPU time: 60.03663 sec    iterations: 269129
