@@ -43,18 +43,22 @@ def make_matrix(n, task, rho_max = None, case = None):
     """
     d = np.ones(n)
     if task == 1:               # Make diagonal elements according to task 2b
-        h = 1/float(n)
+        rho_0 = 0.0
+        rho_max = 1.0
+        h = (rho_max - rho_0)/float(n)
         d *= 2/h**2
     elif task == 2:
         for i in range(n):      # Make diagonal elements according to task 2d
-            h = rho_max/float(n)
+            rho_0 = 0.0
+            h = (rho_max - rho_0)/float(n)
             v = np.empty(n)
             v[i] = ((i+1)*h)**2
             d[i] = 2/h**2 + v[i]
     elif task == 3:             # Make diagonal elements according to task 2e
         for i in range(n):
             omega = np.array([0.01, 0.5, 1, 5])
-            h = rho_max/float(n)
+            rho_0 = 0.0
+            h = (rho_max - rho_0)/float(n)
             v = np.empty(n)
             v[i] = omega[case]**2*(i*h)**2 + 1/(i+1*h)
             d[i] = 2/h**2 + v[i]
@@ -190,8 +194,11 @@ def jacobi(A, epsilon = 1.0E-8):
 
 if __name__ == "__main__":
     
-    list1 = [10, 100, 200,250, 300, 350, 400]
-    list2 = [5, 6, 7, 8]
+
+    ## Makes textfile to be used in task 2d! Uncomment to use.
+    ##_________________________________________________________
+#    list1 = [10, 100, 200,250, 300, 350, 400]
+#    list2 = [5, 6, 7, 8]
 #    outfile = open('result.txt', 'w')
 #    for i in range(len(list1)):
 #        for j in range(len(list2)):
@@ -200,34 +207,57 @@ if __name__ == "__main__":
 #            eigval = sorted(eigval)
 #            outfile.write('n: {}   Lambda_1: {:.5f}   Lambda_2: {:.5f}   Lambda_3: {:.5f}   Lambda_4: {:.5f}   CPU time: {:.5f} sec    iterations: {}\n'.format(list1[i], eigval[0], eigval[1], eigval[2], eigval[3], time_tot, teller))
 #    outfile.close()
-    outfile = open('result.txt', 'w')
-    for i in range(len(list1)):
-        A= make_matrix(list1[i],2,5)
-        eigval,eigvec, Amax , teller, time_tot = jacobi(A)
-        eigval = sorted(eigval)
-        outfile.write('n: {}   Lambda_1: {:.5f}   Lambda_2: {:.5f}   Lambda_3: {:.5f}   Lambda_4: {:.5f}   CPU time: {:.5f} sec    iterations: {}\n'.format(list1[i], eigval[0], eigval[1], eigval[2], eigval[3], time_tot, teller))
-    outfile.close()
+#    outfile = open('result.txt', 'w')
+#    for i in range(len(list1)):
+#        A= make_matrix(list1[i],2,5)
+#        eigval,eigvec, Amax , teller, time_tot = jacobi(A)
+#        eigval = sorted(eigval)
+#        outfile.write('n: {}   Lambda_1: {:.5f}   Lambda_2: {:.5f}   Lambda_3: {:.5f}   Lambda_4: {:.5f}   CPU time: {:.5f} sec    iterations: {}\n'.format(list1[i], eigval[0], eigval[1], eigval[2], eigval[3], time_tot, teller))
+#    outfile.close()
     
+    ## 
+    ##_________________________________________________________
 #     A = make_matrix(10, 2, 9)
 ##     eigval_np, teigvec_np = np.linalg.eig(A)
 #     eigval, eigvec, Amax, teller, time_tot = jacobi(A)
-#     np.testing.assert_allclose(sorted(eigval), sorted(eigval_np), rtol=1e-08, atol=0)
-#    eigenval = analytical_eig(A)
+
     
-#    omegas = [0, 1, 2, 3]
-#    n = 10
-#    eigvals = np.zeros((len(omegas), len(range(n))))
-#    plt.figure()
-#    
-#    for j in range(n):
-#        A = make_matrix(10, 3, 9, omegas[1])
-#        eigvals, eigvec, amax, t, time_tot = jacobi(A) 
-#        plt.plot(eigvec[:,i], label = 'Omega = {}'.format(omegas[1]))
-#    #plt.legend(fontsize = 10)
-#    plt.show()
+    ##
+    ##_________________________________________________________
+    omegas = [0, 1, 2, 3]
+    omegas1 = [0.01, 0.5, 1,5]
+    # rho_maxes = [60, 8, 5, 8]
+    n = 250
+    eigvals = np.empty((len(range(n)), len(omegas)))
+    plt.figure()
+    rhos = np.linspace(0, 5, n)
     
+    for i in omegas:
+        A = make_matrix(n, 3, 5, omegas[i])
+        eigval, eigvec, amax, t, time_tot = jacobi(A) 
+        ind = np.argmin(abs(eigval))
+        norm = np.linalg.norm(abs(eigvec[:,ind])**2)
+        
+       # eigvals[i] = min(eigval)
+        plt.plot(rhos, (abs(eigvec[:,ind])**2)/norm,  label = 'Omega = {}, ground-state eigenvalue = {:.3f}'.format(omegas1[i], eigval[ind]))
+    plt.xlabel('Radial coordinate, rho')
+    plt.ylabel('Relative radial wavefunction, |phi(rho)|^2')
+    plt.title('Relative radial wave function for different omegas')
+    plt.grid()
+    plt.legend(fontsize = 10)
+    plt.savefig('solutions.pdf')
+    
+    ##
+    ##_________________________________________________________
 #    A = make_matrix(100, 3, 9, 0)
 #    eigvals, eigvec, amax, t, time_tot = jacobi(A)
 #    plt.plot(eigvec[:,19])
 #    plt.show()
+    
+    
+    ## drittgreier:
+    ##_________________________________________________________
+#    V_0 = (3/2)*(0.01/2)**(2/3)
+#    omega_e = m.sqrt(3)*0.01
+#    e_m = V_0 + omega_e*(1/2)
     
