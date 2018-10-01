@@ -16,6 +16,7 @@ from numpy import identity, diagonal
 import math as m
 import time
 from numba import jit
+import matplotlib.pyplot as plt
 
 
 def make_matrix(n, task, rho_max = None, case = None):
@@ -41,28 +42,28 @@ def make_matrix(n, task, rho_max = None, case = None):
         A       - tridiagonal Toepliz matriz
     """
     d = np.ones(n)
-    if task == 1:
+    if task == 1:               # Make diagonal elements according to task 2b
         h = 1/float(n)
         d *= 2/h**2
     elif task == 2:
-        for i in range(n):
+        for i in range(n):      # Make diagonal elements according to task 2d
             h = rho_max/float(n)
             v = np.empty(n)
             v[i] = ((i+1)*h)**2
             d[i] = 2/h**2 + v[i]
-    elif task == 3:
+    elif task == 3:             # Make diagonal elements according to task 2e
         for i in range(n):
             omega = np.array([0.01, 0.5, 1, 5])
             h = rho_max/float(n)
             v = np.empty(n)
-            v[i] = omega[case-1]**2*(i*h)**2 + 1/(i+1*h)
+            v[i] = omega[case]**2*(i*h)**2 + 1/(i+1*h)
             d[i] = 2/h**2 + v[i]
     a = -1/h**2
     A = np.zeros((n, n))
     for i in range(n):
         for j in range(n):
             if i == j:
-                A[i, j] = d[i-1]
+                A[i, j] = d[i]
         for j in range(n-1):
             if i == (j+1):
                 A[j, i] = a
@@ -86,7 +87,7 @@ def analytical_eig(A):
     a = -1/float(h)**2
     eigenval = np.empty(n)
     for j in range(1,n+1):
-        eigenval[j-1] = d + 2*a*np.cos((j*np.pi)/(float(n)+1)) #exact
+        eigenval[j-1] = d + 2*a*np.cos((j*np.pi)/(float(n)+1)) # Analytic solution
         
     return eigenval
 
@@ -95,6 +96,7 @@ def jacobi(A, epsilon = 1.0E-8):
     """
     Implements Jacobi's method of rotation to find the eigenvalues and 
     eigenvectors of a tridiagonal, symmetric Toepliz matrix of size nxn
+    
     Input: 
         A           - Tridiagonal Toepliz matriz
         epsilon     - Tolerance
@@ -109,7 +111,16 @@ def jacobi(A, epsilon = 1.0E-8):
     t1 = time.time()
     
     @jit(debug = True)
-    def maxElem(A):
+    def maxElem(A): 
+        """
+        Finds the largest elements on the non-diagonals of A 
+        
+        Input: 
+            A           - Tridiagonal Toepliz matriz
+        Output: 
+            Amax        - Maximum value on non-diagonal
+            k, l        - position of AMax
+        """
         n = len(A)
         AMax = 0.0
         for i in range(n):
@@ -121,19 +132,26 @@ def jacobi(A, epsilon = 1.0E-8):
 
     @jit(debug = True)
     def rotate(A, R, k, l):
-        n = len(A)
+        """
+        Rotates A  
         
-        if A[k,l] !=0.0:
-            tau = (A[l,l] - A[k,k])/(2*A[k,l])
-            if tau > 0:
-                t = 1.0/(tau +m.sqrt(1.0 + tau**2))
-            else:
-                t = -1.0/(-tau +m.sqrt(1.0 + tau**2))
-            c = 1/m.sqrt(1 + t**2)
-            s = c*t
+        Input: 
+            A           - Tridiagonal Toepliz matriz
+            R           - nxn sized identity matrix  
+            k, l        - position of largest elements on non-diagonal
+        """
+        n = len(A)
+                
+        
+        tau = (A[l,l] - A[k,k])/(2*A[k,l])
+        if tau > 0:
+            t = 1.0/(tau +m.sqrt(1.0 + tau**2))
         else:
-            c = 1.0
-            s = 0.0
+            t = -1.0/(-tau +m.sqrt(1.0 + tau**2))
+        c = 1/m.sqrt(1 + t**2)
+        s = c*t
+        
+
         a_kk = A[k,k]
         a_ll = A[l,l]
         A[k,k] = c**2*a_kk - 2.0*c*s*A[k,l] + s**2*a_ll
@@ -159,18 +177,57 @@ def jacobi(A, epsilon = 1.0E-8):
     iterations = 0
     for i in range(maxRot):
         if i == maxRot-1:
-            print('advarsel')
+            print('Warning: max iterations reached')
         AMax, k, l = maxElem(A)
         iterations +=1
         if AMax < epsilon:
             
             t2 = time.time()
-            print("Time used: {:.5f} sec".format(t2-t1))
-            return diagonal(A),R, AMax, iterations
+            time_tot = (t2-t1)
+            return diagonal(A),R, AMax, iterations, time_tot 
         rotate(A,R,k,l)
-    
+
 
 if __name__ == "__main__":
-    A= make_matrix(10, 3, 1,3)
-    eigenval = analytical_eig(A)
-    eigval,eigvec, Amax , teller = jacobi(A)
+    
+    list1 = [10, 100, 200,250, 300, 350, 400]
+    list2 = [5, 6, 7, 8]
+#    outfile = open('result.txt', 'w')
+#    for i in range(len(list1)):
+#        for j in range(len(list2)):
+#            A= make_matrix(list1[i],2,list2[j])
+#            eigval,eigvec, Amax , teller, time_tot = jacobi(A)
+#            eigval = sorted(eigval)
+#            outfile.write('n: {}   Lambda_1: {:.5f}   Lambda_2: {:.5f}   Lambda_3: {:.5f}   Lambda_4: {:.5f}   CPU time: {:.5f} sec    iterations: {}\n'.format(list1[i], eigval[0], eigval[1], eigval[2], eigval[3], time_tot, teller))
+#    outfile.close()
+    outfile = open('result.txt', 'w')
+    for i in range(len(list1)):
+        A= make_matrix(list1[i],2,5)
+        eigval,eigvec, Amax , teller, time_tot = jacobi(A)
+        eigval = sorted(eigval)
+        outfile.write('n: {}   Lambda_1: {:.5f}   Lambda_2: {:.5f}   Lambda_3: {:.5f}   Lambda_4: {:.5f}   CPU time: {:.5f} sec    iterations: {}\n'.format(list1[i], eigval[0], eigval[1], eigval[2], eigval[3], time_tot, teller))
+    outfile.close()
+    
+#     A = make_matrix(10, 2, 9)
+##     eigval_np, teigvec_np = np.linalg.eig(A)
+#     eigval, eigvec, Amax, teller, time_tot = jacobi(A)
+#     np.testing.assert_allclose(sorted(eigval), sorted(eigval_np), rtol=1e-08, atol=0)
+#    eigenval = analytical_eig(A)
+    
+#    omegas = [0, 1, 2, 3]
+#    n = 10
+#    eigvals = np.zeros((len(omegas), len(range(n))))
+#    plt.figure()
+#    
+#    for j in range(n):
+#        A = make_matrix(10, 3, 9, omegas[1])
+#        eigvals, eigvec, amax, t, time_tot = jacobi(A) 
+#        plt.plot(eigvec[:,i], label = 'Omega = {}'.format(omegas[1]))
+#    #plt.legend(fontsize = 10)
+#    plt.show()
+    
+#    A = make_matrix(100, 3, 9, 0)
+#    eigvals, eigvec, amax, t, time_tot = jacobi(A)
+#    plt.plot(eigvec[:,19])
+#    plt.show()
+    
