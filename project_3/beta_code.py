@@ -1,57 +1,79 @@
-
-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 """
-To run, use python beta_code.py
+To run, use python master_document.py
 
-Project 3,
+Project 3, task 3d,
 changing the initial algorithm to include changes of the gravitational force.
 The solver class now needs beta as input, and the acceleration can be changed easily.
 
-At the end of the code, the class and functions are called and a plot is produced
-with different values of beta.
 """
 
 
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 
 
 class planets:
+    """
+    Class that creates the planet-object
+    
+    Input: 
+        vel0    - <numpy array> initial velocity of the planet in AU/year
+        pos0    - <numpy array> initial position of the planet in AU
+        mass    - <float> mass of planet
+    """
     def __init__(self, vel0, pos0, mass):
-        self.vel0 = vel0        # AU/year
-        self.pos0 = pos0        # position in astronomical units
+        self.vel0 = vel0        
+        self.pos0 = pos0        
         self.mass = mass/2.10E30
         self.G = 4*np.pi**2
 
-    def kinetic_energy(self, vel):
-        KE =  0.5*self.mass*np.linalg.norm(vel,axis=1)**2
-        return KE
-
-    def potential_energy(self, r, mass_of_sun=1):
-        PE = -self.G*mass_of_sun*self.mass/np.linalg.norm(r, axis=1)#self.distance(pos)
-        return PE
-
-    def angular_momentum(self, vel, r):
-        L = np.cross(r, vel*self.mass,axis=1)
-        return L
-
     def make_pos_vec(self, N):
+        """
+        Creates a position vector of size (N,3) with pos0 as first entry
+        
+        Input: 
+            N       - <int> length of vector
+        """
         self.pos_vec = np.zeros((N,3))
         self.pos_vec[0] = self.pos0
 
     def make_vel_vec(self,N):
+        """
+        Creates a velocity vector of size (N,3) with vel0 as first entry
+        
+        Input: 
+            N       - <int> length of vector
+        """
         self.vel_vec = np.zeros((N,3))
         self.vel_vec[0] = self.vel0
 
     def make_acc_vec(self,N,acc0):
+        """
+        Creates an acceleration vector of size (N,3) with acc0 as first entry
+        
+        Input: 
+            N       - <int> length of vector
+            acc0    - <numpy array> initial acceleration of the planet
+        """
         self.acc_vec = np.zeros((N,3))
         self.acc_vec[0] = acc0
 
 
 
 def system(*args):
+    """
+    Function that generates a system of all input planets
+    
+    Input: 
+        *args   - <class object of planets> planets to be used in further 
+                  calculations
+
+    Output: 
+        system  - <list> all planets in the system
+    """
     system = []
     for i in args:
         system.append(i)
@@ -60,6 +82,16 @@ def system(*args):
 
 
 class solver:
+    """
+    Class that calculates the trajectory of a planet by applying the velocity
+    Verlet method
+    
+    Input: 
+        system  - <list> all planets in the system
+        N       - <int> length of list
+        dt      - <float> step size
+        b       - <float> adjustment of gravitational force
+    """
     def __init__(self, system, N, dt,b):
         self.dt = dt
         self.N = N
@@ -74,6 +106,17 @@ class solver:
             i.make_acc_vec(N, self.acceleration(i, 0, b))
 
     def acceleration(self, current, i, b):
+        """
+        Calculates the acceleration of the planet by adjusting the 
+        gravitational force due to the presence of other planets
+        
+        Input: 
+            current - <class object of planets> current planet
+            i       - <int> index
+            b       - <float> adjustment of gravitational force
+        Output: 
+            acc     - <numpy array> acceleration of planet    
+        """
         acc = np.zeros(3)
 
         for planet in self.system:
@@ -85,6 +128,10 @@ class solver:
 
 
     def velocity_verlet(self):
+        """
+        Calculates the trajectory of the planet by using the velocity Verlet
+        method
+        """
 
         b = self.b
         dt = self.dt
@@ -107,44 +154,4 @@ class solver:
 
 
 if __name__ == "__main__":
-
-    # As we need the Sun to be the mass center, its position is set in origo
-    # We assume that the velocity of the Sun is negelectable compared to the Earth
-    massS     = 2E30
-    posS      = np.array([0,0,0])
-    velS      = 0
-
-    massE = 6E24
-    posE    = np.array([9.004267194046488E-01,4.329702891250327E-01,-9.309259935529284E-05])
-    velE    = np.array([-7.644048786784979E-03,1.548720517812966E-02,9.799447004349826E-08])*365
-
-    Earth = planets(velE, posE, massE)
-    Sun = planets(velS, posS, massS)
-    system = system(Sun, Earth)
-
-    # Beta = 3
-    plt.figure()
-    solve = solver(system,  8000, 1/3650, 3)
-    solve.velocity_verlet()
-    plt.plot(Sun.pos_vec[:,0], Sun.pos_vec[:,1], 'yo', linewidth = 2, label = 'Sun')
-    plt.plot(Earth.pos_vec[:,0], Earth.pos_vec[:,1], label= 'beta = 2.0')
-
-    # Beta = 3.5
-    solve = solver(system,  8000, 1/3650, 3.5)
-    solve.velocity_verlet()
-    plt.plot(Earth.pos_vec[:,0], Earth.pos_vec[:,1],label =  'beta = 2.5')
-
-    # Beta = 4.0
-    solve = solver(system,  8000, 1/3650, 4)
-    solve.velocity_verlet()
-    plt.plot(Earth.pos_vec[:,0], Earth.pos_vec[:,1], label = 'beta = 3.0')
-
-    plt.xlabel('x [AU]', fontsize = 10)
-    plt.ylabel('y [AU]', fontsize = 10)
-
-    plt.xlim(-1.5,3.5)
-    plt.ylim(-2, 1.5)
-    plt.title('Trajectory of Earth with r^beta')
-    plt.legend()
-    plt.savefig('verlet_beta_edition.pdf')
-    plt.show()
+    pass
