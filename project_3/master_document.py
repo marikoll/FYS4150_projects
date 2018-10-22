@@ -319,6 +319,7 @@ precession = np.load('textfiles/precession.npy')
 
 plt.figure()
 plt.plot(np.arctan(precession[:,1]/precession[:,0])*180*3600/np.pi)
+plt.grid()
 plt.xlabel('Time')
 plt.ylabel('Angle')
 plt.savefig('figs/precession.pdf')
