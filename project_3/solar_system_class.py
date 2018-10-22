@@ -17,10 +17,6 @@ class planets:
         self.pos0 = pos0        # position in astronomical units
         self.mass = mass/2.10E30
         self.G = 4*np.pi**2
-
-#    def distance(self, pos):
-#        self.r = np.linalg.norm(pos,axis=1)
-#        return self.r
         
     def kinetic_energy(self, vel):
         KE =  0.5*self.mass*np.linalg.norm(vel,axis=1)**2
@@ -86,67 +82,25 @@ class solver:
 
         
     def velocity_verlet(self):
-#
-#        t_f = 1
-#        t = 0
-#        h = np.linspace(t, t_f, self.N*t_f)
-#        dt = h[1]-h[0]
         dt = self.dt
+        dt05 = 0.5*dt
         dt2 = dt**2
-        
-#        pos_v = np.empty((len(h),3))
-#        pos_v[0,:] = self.pos
-#        
-#        vel_v = np.empty((len(h),3))
-#        vel_v[0,:] = self.vel
-#        
-#        acc_v = np.empty((len(h),3))
-#        acc_v[0,:] = self.acceleration(self.pos)
+        dt205 = 0.5*dt2
+
         
         start = time.time()
-#        for i in range(self.N-1):
-#            for j in self.system:
-#                j.pos_vec[i+1] = j.pos_vec[i] + dt*j.vel_vec[i] + 0.5*dt2*j.acc_vec[i]
-#            for j in self.system:
-#                j.acc_vec[i+1] = self.acceleration(j,i+1)
-#            for j in self.system:
-#                j.vel_vec[i+1] = j.vel_vec[i] + 0.5*(j.acc_vec[i]+j.acc_vec[i+1])*dt
+
         for i in range(self.N-1):
             for planet in self.system:
-                planet.pos_vec[i+1] = planet.pos_vec[i] + dt*planet.vel_vec[i]\
-                + 0.5*dt2*planet.acc_vec[i]
+                planet.pos_vec[i+1] = planet.pos_vec[i] + dt*planet.vel_vec[i] + dt205*planet.acc_vec[i]
             for planet in self.system:
                 planet.acc_vec[i+1] = self.acceleration(planet, i+1)
             for planet in self.system:
-                planet.vel_vec[i+1] = planet.vel_vec[i] + \
-                0.5*dt*(planet.acc_vec[i] + planet.acc_vec[i+1])
+                planet.vel_vec[i+1] = planet.vel_vec[i] + dt05*(planet.acc_vec[i] + planet.acc_vec[i+1])
         stop = time.time()
         print("Verlet: {:.3f} sec".format(stop-start))
     
-if __name__ == "__main__":
-    
-#    velE = np.array([-5.71E-3, 1.62E-2, -3.03E-7])
-#    posE = np.array([9.47E-1, 3.21E-1, -9.31E-5])
-#    massE = 6E24
-#    N = 220
-#    Earth = planets(velE, posE, massE)
-#
-#
-#    velJ = np.array([6.45E-3, -3.4E-3, -1.3E-4])
-#    posJ = np.array([-2.67, -4.65, 7.9E-2])
-#    massJ = 1898.13E24
-#    Jupiter = planets(velJ, posJ, massJ)
-#
-#
-#    velM = np.array([1.98E-1, -1.04E-2, -2.67E-3])
-#    posM = np.array([-1.94E-1, -4.13E-1, -1.67E-2])
-#    massM = 3.302E23
-#    Mercury = planets(velM, posM, massM)
-#    massS = 2E30
-#    posS = np.array([0,0,0])
-#    velS = -(massE*velE + massJ*velJ + massM*velM)/massS
-#    Sun = planets(velS, posS, massS)
-    
+if __name__ == "__main__":    
     pass
     
     
