@@ -10,6 +10,7 @@ import numpy as np
 import solar_system_class as ss
 import Earth_Jupiter_Sun as ejs
 import Earth_Sun as es
+import Mercury_Sun as ms
 import matplotlib.pyplot as plt
 
 
@@ -17,6 +18,9 @@ import matplotlib.pyplot as plt
 massM   = 3.3E23
 posM    =  np.array([-4.466974942983433E-02,-4.551297184815911E-01,-3.377443034243644E-02])
 velM    =  np.array([2.235388667387174E-02,-1.255928387575858E-03,-2.154047309352793E-03])*365
+
+posM    = np.array([0.3075,0,0])
+velM    = np.array([0,12.44,0])
 
 massV   = 4.9E24
 posV    =  np.array([6.771183423096696E-01,2.635570892119448E-01,-3.564015770708658E-02])
@@ -71,27 +75,38 @@ massS   = 2E30
 
 ## 3c)
 
-dt = 10.0**np.arange(-1, -6, -1)# [1/3.65, 1/36.5, 1/365, 1/3650, 1/36500]
-planet = ['Sun', 'Earth']
-deltas = []
-# plt.figure()
-for i in dt:
-    #for method in ['.velocity_verlet()', '.euler_fwd()']:
-    posS    = np.array([0,0,0])
-    velS    = massE*velE/massS
-    Earth   = es.planets(velE, posE, massE)
-    Sun     = es.planets(velS, posS, massS)
-
-    systemES = es.system(Sun, Earth)
-
-    solveES  = es.solver(systemES, int(1/i+1), i)
-    solveES.euler_fwd()
-    deltas.append(np.linalg.norm(systemES[1].pos_vec[0,:]- systemES[1].pos_vec[-1,:]))
-plt.loglog(dt, deltas)
-plt.grid()
-plt.xlabel('dt', fontsize = 10)
-plt.ylabel('start postition - end position', fontsize = 10)
-plt.title('Difference between start and end position', fontsize = 15)
+#dt = 10.0**np.arange(-1, -7, -1)# [1/3.65, 1/36.5, 1/365, 1/3650, 1/36500]
+#planet = ['Sun', 'Earth']
+#energy = []
+#angular_momentum = []
+## plt.figure()
+#for i in dt:
+#    #for method in ['.velocity_verlet()', '.euler_fwd()']:
+#    posS    = np.array([0,0,0])
+#    velS    = massE*velE/massS
+#    Earth   = es.planets(velE, posE, massE)
+#    Sun     = es.planets(velS, posS, massS)
+#
+#    systemES = es.system(Sun, Earth)
+#
+#    solveES  = es.solver(systemES, int(1/i), i)
+#    solveES.velocity_verlet()
+#    # deltas.append(np.linalg.norm(systemES[1].pos_vec[0,:]- systemES[1].pos_vec[-1,:]))
+#    kin_energy = systemES[1].kinetic_energy(systemES[1].vel_vec)
+#    pot_energy = systemES[1].potential_energy(systemES[1].pos_vec)
+#    energy.append((kin_energy[-1] + pot_energy[-1])-(kin_energy[0] + pot_energy[0]))
+##    for l in range(int(1/i)):
+##        r = np.linalg.norm(systemES[1].pos_vec, axis = 1)
+#    l1 = systemES[1].angular_momentum(systemES[1].vel_vec[0,:], systemES[1].pos_vec[0,:])
+#    l2 = systemES[1].angular_momentum(systemES[1].vel_vec[-1,:], systemES[1].pos_vec[-1,:])
+#    angular_momentum.append(l2 - l1)
+#plt.semilogx(dt, np.linalg.norm(angular_momentum, axis = 1))
+#plt.ticklabel_format(axis = 'y', style = 'sci', scilimits=(0,0))
+#plt.grid()
+#plt.xlabel('dt', fontsize = 10)
+#plt.ylabel('L2 - L1', fontsize = 10)
+#plt.title('L2 - L1 with Euler method', fontsize = 15)
+#plt.savefig('Euler_angmom.pdf')
 #    plt.semilogx(i, systemES[1].pos_vec[0,0]- systemES[1].pos_vec[-1,0])
 #    plt.xlabel('dt')
 #    plt.ylabel('position')
@@ -204,6 +219,29 @@ plt.title('Difference between start and end position', fontsize = 15)
 #
 #plt.savefig('task3e_massJ{}.pdf'.format(masstimes))
 #plt.show()
+
+
+## Task 3f)
+
+
+dt = 1e-7
+N = int(3e7)
+p_vel = np.array(ms.velocity_verlet(posM, velM, N, dt))
+# np.save("p_vel.txt", p_vel)
+
+#planets = ['Sun', 'Mercury']
+#
+#fig = plt.figure()
+##fig.suptitle('Mass of Jupiter: {:.1e} kg'.format(massJ), fontsize = 15)
+#for i in range(len(system)):
+##    ax1 =plt.subplot(1, 2, 1)
+#    plt.plot(system[i].pos_vec[:,0],system[i].pos_vec[:,1], label = planets[i])
+##    ax1.set_xlim([-20, 400])
+##    ax1.set_ylim([-180, 50])
+#    plt.title('Sun - Mercury', fontsize  = 10)
+#    plt.ylabel('y [AU]', fontsize  = 10)
+#    plt.xlabel('x [AU]', fontsize  = 10)
+#    plt.legend()
 
 
 
