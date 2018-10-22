@@ -1,18 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Oct 21 12:23:49 2018
+To run, use python master_document.py, preferrably on a fast computer
 
-@author: maritkollstuen
+Project 3, task 3f,
+
+Module that calculates the precession of all Mercury by adding a relativistic
+correction to the Newtonian gravitational force and the velocity Verlet method
 """
 
 import numpy as np
-# import matplotlib.pyplot as plt
 import time
 
-
-
 def velocity_verlet(pos0, vel0, N, dt):
+    """
+    Function that calculates the trajectory of the planet by using the velocty
+    Verlet method
+    
+    Input: 
+        pos0    - <numpy array> initial position of the planet in AU
+        vel0    - <numpy array> initial velocity of the planet in AU/year
+        N       - <int> length of vector
+        dt      - <float> step size
+        
+    Output: 
+        precession - <numpy array> position of the trajectory
+    """
     G = 4*np.pi**2
     c2 = 63239.7263**2
     dt2 = dt**2
@@ -24,7 +37,7 @@ def velocity_verlet(pos0, vel0, N, dt):
     acc = -pos[0]*G/np.linalg.norm(pos)**3*(1+(3*np.linalg.norm(np.cross(pos,vel))**2)/(np.linalg.norm(pos)**2*c2))
 
     
-    pos_p = []
+    precession = []
     
     
     posnew = pos + dt*vel + 0.5*dt2*acc
@@ -53,7 +66,7 @@ def velocity_verlet(pos0, vel0, N, dt):
         velnew = vel + 0.5*(accnew+accnew)*dt
         
         if np.linalg.norm(pos)< r and np.linalg.norm(pos)< np.linalg.norm(posprev):
-            pos_p.append(pos)
+            precession.append(pos)
         
         posprev = pos
         velprev = vel
@@ -66,7 +79,7 @@ def velocity_verlet(pos0, vel0, N, dt):
         
     stop = time.time()
     print("Verlet: {:.3f} sec".format(stop-start))
-    return pos_p
+    return precession
 
 if __name__ == "__main__":    
     pass
