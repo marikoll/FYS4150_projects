@@ -32,7 +32,7 @@ class planets(object):
         return PE
     
     def angular_momentum(self, vel, r):
-        L = np.cross(r, vel*self.mass,axis=1)
+        L = np.cross(r, vel*self.mass)#,axis=1)
         return L
     
     def make_pos_vec(self, N):
