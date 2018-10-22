@@ -115,8 +115,7 @@ if __name__ == "__main__":
     velS      = 0
 
     massE = 6E24
-    posE  = np.array([9.528047055398201E-01,3.053612869840809E-01,-9.272902073041313E-05])
-    posE = np.array([9.472338196836673E-01,3.216790877655131E-01,-9.310425816193890E-05])
+    posE    = np.array([9.004267194046488E-01,4.329702891250327E-01,-9.309259935529284E-05])
     velE    = np.array([-7.644048786784979E-03,1.548720517812966E-02,9.799447004349826E-08])*365
 
     Earth = planets(velE, posE, massE)
@@ -143,8 +142,8 @@ if __name__ == "__main__":
     plt.xlabel('x [AU]', fontsize = 10)
     plt.ylabel('y [AU]', fontsize = 10)
 
-    plt.xlim(-1,3)
-    plt.ylim(-1.5, 1)
+    plt.xlim(-1.5,3.5)
+    plt.ylim(-2, 1.5)
     plt.title('Trajectory of Earth with r^beta')
     plt.legend()
     plt.savefig('verlet_beta_edition.pdf')
