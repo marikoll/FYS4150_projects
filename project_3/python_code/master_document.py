@@ -62,7 +62,7 @@ massP   = 1.31E22
 posP    = np.array([1.165895866372055E+01,-3.157299883744404E+01,6.054513403127080E-03])
 velP    = np.array([3.023518143470085E-03,4.354001925477489E-04,-9.190982697153275E-04])*365
 
-## SUN 
+## SUN
 massS   = 2E30
 posS    = np.array([0, 0, 0])
 
@@ -75,7 +75,7 @@ posS    = np.array([0, 0, 0])
 #velS    = massE*velE/massS
 #
 #Earth   = es.planets(velE, posE, massE)
-#Sun     = es.planets(velS, posS, massS)          
+#Sun     = es.planets(velS, posS, massS)
 #
 #
 #system_verlet = es.system(Earth, Sun)
@@ -123,7 +123,7 @@ posS    = np.array([0, 0, 0])
 #methods = ['Euler', 'Verlet']
 #
 #
-### Energy conservation: 
+### Energy conservation:
 #for method in methods:
 #    plt.figure()
 #    plt.semilogx(dt, energy)
@@ -136,7 +136,7 @@ posS    = np.array([0, 0, 0])
 #    plt.show()
 #
 #
-### Angular momentum: 
+### Angular momentum:
 #for method in methods:
 #    plt.figure()
 #    plt.semilogx(dt, np.linalg.norm(angular_momentum, axis = 1))
@@ -276,7 +276,7 @@ posS    = np.array([0, 0, 0])
 #
 #velS    = -(massSa*velSa + massM*velM + massE*velE + massJ*velJ + massN*velN \
 #            + massP*velP + massU*velU + massV*velV + massMa*velMa)/massS
-#    
+#
 #Mercury = ss.planets(velM, posM, massM)
 #Earth   = ss.planets(velE, posE, massE)
 #Jupiter = ss.planets(velJ, posJ, massJ)
@@ -305,24 +305,29 @@ posS    = np.array([0, 0, 0])
 
 ############# PRECESSION OF MERCURY, TASK 3F ######################
 
-# Speed and position of Mercury at perihelion: 
+# Speed and position of Mercury at perihelion:
 #
-posM    = np.array([0.3075,0,0])
-velM    = np.array([0,12.44,0])
+#posM    = np.array([0.3075,0,0])
+#velM    = np.array([0,12.44,0])
+#
+#dt = 1e-7
+#N = int(100e7)
+#precession = np.array(ms.velocity_verlet(posM, velM, N, dt))
+#np.save("precession", precession)
+#
+#p_100 = np.load('textfiles/precession_100.npy')
+#p_50 = np.load('textfiles/perihelion_50yrs.npy')
+#r_100 = np.load('textfiles/precession_not_relativistic_100yrs.npy')
 
-dt = 1e-7
-N = int(100e7)
-precession = np.array(ms.velocity_verlet(posM, velM, N, dt))
-np.save("precession", precession)
-#
-#precession = np.load('textfiles/perihelion_50yrs.npy')
-#
-#
-#
 #plt.figure()
-#plt.plot(np.arctan(precession[:,1]/precession[:,0])*180*3600/np.pi)
+#plt.plot(np.arctan(p_100[:, 1]/p_100[:, 0])*180*3600/np.pi, 'b', label = 'corrected Newton, N = 1e8, dt = 1e-6')
+#plt.plot(np.arctan(p_50[:, 1]/p_50[:, 0])*180*3600/np.pi, 'k', label = 'corrected Newton, N = 0.5e9, dt = 1e-7')
+#plt.plot(np.arctan(r_100[:, 1]/r_100[:, 0])*180*3600/np.pi, 'r', label = 'pure Newtonian, N = 1e8, dt = 1e-6')
+#plt.plot(442, 43, 'ro', linewidth = 4, label = 'observed value')
+#plt.legend(loc = 'upper left', fontsize = 13)
 #plt.grid()
-#plt.xlabel('Perihelion points')
-#plt.ylabel('Arc seconds')
-#plt.savefig('figs/precession.pdf')
-
+#plt.xlabel('No. perihelions', fontsize = 12)
+#plt.ylabel('arc seconds', fontsize = 12)
+#plt.title('Perihelion precession of Mercury', fontsize = 15)
+#plt.savefig('figs/perhelion_precession.pdf')
+#plt.show()
