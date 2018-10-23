@@ -27,14 +27,14 @@ def velocity_verlet(pos0, vel0, N, dt):
         precession - <numpy array> position of the trajectory
     """
     G = 4*np.pi**2
-    c2 = 63239.7263**2
+    #c2 = 63239.7263**2
     dt2 = dt**2
     
     start = time.time()
     
     pos = pos0
     vel = vel0
-    acc = -pos[0]*G/np.linalg.norm(pos)**3*(1+(3*np.linalg.norm(np.cross(pos,vel))**2)/(np.linalg.norm(pos)**2*c2))
+    acc = -pos[0]*G/np.linalg.norm(pos)**3#*(1+(3*np.linalg.norm(np.cross(pos,vel))**2)/(np.linalg.norm(pos)**2*c2))
 
     
     precession = []
