@@ -101,6 +101,9 @@ posS    = np.array([0, 0, 0])
 #
 #dt = 10.0**np.arange(-1, -7, -1)
 #planet = ['Sun', 'Earth']
+#
+### Verlet
+#
 #energy = []
 #angular_momentum = []
 #for i in dt:
@@ -120,33 +123,77 @@ posS    = np.array([0, 0, 0])
 #    l2 = systemES[1].angular_momentum(systemES[1].vel_vec[-1,:], systemES[1].pos_vec[-1,:])
 #    angular_momentum.append(l2 - l1)
 #
-#methods = ['Euler', 'Verlet']
-#
-#
 ### Energy conservation: 
-#for method in methods:
-#    plt.figure()
-#    plt.semilogx(dt, energy)
-#    plt.ticklabel_format(axis = 'y', style = 'sci', scilimits=(0,0))
-#    plt.grid()
-#    plt.xlabel('dt', fontsize = 10)
-#    plt.ylabel('E2 - E1', fontsize = 10)
-#    plt.title('E2 - E1 with {} method'.format(method), fontsize = 15)
-#    plt.savefig('figs/{}_energy.pdf'.format(method))
-#    plt.show()
+#
+#plt.figure()
+#plt.semilogx(dt, energy)
+#plt.ticklabel_format(axis = 'y', style = 'sci', scilimits=(0,0))
+#plt.grid()
+#plt.xlabel('dt', fontsize = 10)
+#plt.ylabel('E2 - E1', fontsize = 10)
+#plt.title('E2 - E1 with Verlet method', fontsize = 15)
+#plt.savefig('figs/Verlet_energy.pdf')
+#plt.show()
 #
 #
 ### Angular momentum: 
-#for method in methods:
-#    plt.figure()
-#    plt.semilogx(dt, np.linalg.norm(angular_momentum, axis = 1))
-#    plt.ticklabel_format(axis = 'y', style = 'sci', scilimits=(0,0))
-#    plt.grid()
-#    plt.xlabel('dt', fontsize = 10)
-#    plt.ylabel('L2 - L1', fontsize = 10)
-#    plt.title('L2 - L1 with {} method'.format(method), fontsize = 15)
-#    plt.savefig('figs/{}_angmom.pdf'.format(method))
-#    plt.show()
+#
+#plt.figure()
+#plt.semilogx(dt, np.linalg.norm(angular_momentum, axis = 1))
+#plt.ticklabel_format(axis = 'y', style = 'sci', scilimits=(0,0))
+#plt.grid()
+#plt.xlabel('dt', fontsize = 10)
+#plt.ylabel('L2 - L1', fontsize = 10)
+#plt.title('L2 - L1 with Verlet method', fontsize = 15)
+#plt.savefig('figs/Verlet_angmom.pdf')
+#plt.show()
+#
+#
+### Euler
+#
+#energy = []
+#angular_momentum = []
+#for i in dt:
+#    posS    = np.array([0,0,0])
+#    velS    = massE*velE/massS
+#    Earth   = es.planets(velE, posE, massE)
+#    Sun     = es.planets(velS, posS, massS)
+#
+#    systemES = es.system(Sun, Earth)
+#
+#    solveES  = es.solver(systemES, int(1/i), i)
+#    solveES.euler_fwd()
+#    kin_energy = systemES[1].kinetic_energy(systemES[1].vel_vec)
+#    pot_energy = systemES[1].potential_energy(systemES[1].pos_vec)
+#    energy.append((kin_energy[-1] + pot_energy[-1])-(kin_energy[0] + pot_energy[0]))
+#    l1 = systemES[1].angular_momentum(systemES[1].vel_vec[0,:], systemES[1].pos_vec[0,:])
+#    l2 = systemES[1].angular_momentum(systemES[1].vel_vec[-1,:], systemES[1].pos_vec[-1,:])
+#    angular_momentum.append(l2 - l1)
+#
+### Energy conservation: 
+#
+#plt.figure()
+#plt.semilogx(dt, energy)
+#plt.ticklabel_format(axis = 'y', style = 'sci', scilimits=(0,0))
+#plt.grid()
+#plt.xlabel('dt', fontsize = 10)
+#plt.ylabel('E2 - E1', fontsize = 10)
+#plt.title('E2 - E1 with Euler method', fontsize = 15)
+#plt.savefig('figs/Euler_energy.pdf')
+#plt.show()
+#
+#
+### Angular momentum: 
+#
+#plt.figure()
+#plt.semilogx(dt, np.linalg.norm(angular_momentum, axis = 1))
+#plt.ticklabel_format(axis = 'y', style = 'sci', scilimits=(0,0))
+#plt.grid()
+#plt.xlabel('dt', fontsize = 10)
+#plt.ylabel('L2 - L1', fontsize = 10)
+#plt.title('L2 - L1 with Euler method', fontsize = 15)
+#plt.savefig('figs/Euler_angmom.pdf')
+#plt.show()
 
 
 ########## ESCAPE VELOCITY, TASK 3D ###############################
@@ -237,7 +284,7 @@ posS    = np.array([0, 0, 0])
 
 #import Earth_Jupiter_Sun as ejs
 #
-#masstimes= 1000 # change to adjust mass of Jupiter
+#masstimes= 1 # change to adjust mass of Jupiter
 #N = 100000
 #dt = 1/3650
 #
@@ -255,11 +302,11 @@ posS    = np.array([0, 0, 0])
 #planets = ['Sun', 'Earth', 'Jupiter']
 #
 #plt.figure()
-#plt.title('Mass of Jupiter: {:.1e} kg'.format(massJ), fontsize = 15)
+#plt.title('Mass of Jupiter: {:.1e} kg'.format(massJ*masstimes), fontsize = 15)
 #for i in range(len(system)):
 #    plt.plot(system[i].pos_vec[:,0],system[i].pos_vec[:,1], label = planets[i])
-#    plt.xlim([-20, 40]) # use when masstimes = 1000
-#    plt.ylim([-25, 10])
+##    plt.xlim([-20, 40]) # use when masstimes = 1000
+##    plt.ylim([-25, 10])
 #    plt.ylabel('y [AU]', fontsize  = 10)
 #    plt.xlabel('x [AU]', fontsize  = 10)
 #    plt.legend()
@@ -307,22 +354,41 @@ posS    = np.array([0, 0, 0])
 
 # Speed and position of Mercury at perihelion: 
 #
-posM    = np.array([0.3075,0,0])
-velM    = np.array([0,12.44,0])
+#posM    = np.array([0.3075,0,0])
+#velM    = np.array([0,12.44,0])
+#
+#dt = 1e-7
+#N = int(100e7)
+#precession = np.array(ms.velocity_verlet(posM, velM, N, dt))
+#np.save("precession", precession)
+#
+p1 = np.load('textfiles/perihelion_50yrs.npy')
+p2 = np.load('textfiles/precession_not_relativistic_100yrs.npy')
 
-dt = 1e-7
-N = int(100e7)
-precession = np.array(ms.velocity_verlet(posM, velM, N, dt))
-np.save("precession", precession)
+
+plt.figure()
+plt.plot(np.arctan(p1[:,1]/p1[:,0])*180*3600/np.pi)
+plt.grid()
+plt.xlabel('Perihelion points')
+plt.ylabel('Arc seconds')
+plt.savefig('figs/precession.pdf')
+
+#########
+#import Earth_Sun as es
 #
-#precession = np.load('textfiles/perihelion_50yrs.npy')
 #
+#posM    = np.array([0.3075,0,0])
+#velM    = np.array([0,12.44,0])
 #
+#velS    = np.array([0,0,0])
 #
-#plt.figure()
-#plt.plot(np.arctan(precession[:,1]/precession[:,0])*180*3600/np.pi)
-#plt.grid()
-#plt.xlabel('Perihelion points')
-#plt.ylabel('Arc seconds')
-#plt.savefig('figs/precession.pdf')
+#dt = 1e-7
+#N = int(100e7)
+#
+#Mercury = es.planets(velM, posM, massM)
+#Sun     = es.planets(velS, posS, massS)
+#
+#mer_sun = es.system(Sun, Mercury)
+#mer_sun_solve = es.solver(mer_sun, N, dt)
+#mer_sun_solve.velocity_verlet()
 
