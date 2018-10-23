@@ -307,20 +307,22 @@ posS    = np.array([0, 0, 0])
 
 # Speed and position of Mercury at perihelion: 
 #
-#posM    = np.array([0.3075,0,0])
-#velM    = np.array([0,12.44,0])
-#
-#dt = 1e-7
-#N = int(100e7)
-#precession = np.array(ms.velocity_verlet(posM, velM, N, dt))
-#np.save("precession", precession)
-#
-precession = np.load('textfiles/precession.npy')
+posM    = np.array([0.3075,0,0])
+velM    = np.array([0,12.44,0])
 
-plt.figure()
-plt.plot(np.arctan(precession[:,1]/precession[:,0])*180*3600/np.pi)
-plt.grid()
-plt.xlabel('Time')
-plt.ylabel('Angle')
-plt.savefig('figs/precession.pdf')
+dt = 1e-7
+N = int(100e7)
+precession = np.array(ms.velocity_verlet(posM, velM, N, dt))
+np.save("precession", precession)
+#
+#precession = np.load('textfiles/perihelion_50yrs.npy')
+#
+#
+#
+#plt.figure()
+#plt.plot(np.arctan(precession[:,1]/precession[:,0])*180*3600/np.pi)
+#plt.grid()
+#plt.xlabel('Perihelion points')
+#plt.ylabel('Arc seconds')
+#plt.savefig('figs/precession.pdf')
 
