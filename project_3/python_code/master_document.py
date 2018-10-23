@@ -62,7 +62,7 @@ massP   = 1.31E22
 posP    = np.array([1.165895866372055E+01,-3.157299883744404E+01,6.054513403127080E-03])
 velP    = np.array([3.023518143470085E-03,4.354001925477489E-04,-9.190982697153275E-04])*365
 
-## SUN 
+## SUN
 massS   = 2E30
 posS    = np.array([0, 0, 0])
 
@@ -75,7 +75,7 @@ posS    = np.array([0, 0, 0])
 #velS    = massE*velE/massS
 #
 #Earth   = es.planets(velE, posE, massE)
-#Sun     = es.planets(velS, posS, massS)          
+#Sun     = es.planets(velS, posS, massS)
 #
 #
 #system_verlet = es.system(Earth, Sun)
@@ -170,6 +170,7 @@ posS    = np.array([0, 0, 0])
 #    l2 = systemES[1].angular_momentum(systemES[1].vel_vec[-1,:], systemES[1].pos_vec[-1,:])
 #    angular_momentum.append(l2 - l1)
 #
+
 ### Energy conservation: 
 #
 #plt.figure()
@@ -194,6 +195,30 @@ posS    = np.array([0, 0, 0])
 #plt.title('L2 - L1 with Euler method', fontsize = 15)
 #plt.savefig('figs/Euler_angmom.pdf')
 #plt.show()
+### Energy conservation:
+#for method in methods:
+#    plt.figure()
+#    plt.semilogx(dt, energy)
+#    plt.ticklabel_format(axis = 'y', style = 'sci', scilimits=(0,0))
+#    plt.grid()
+#    plt.xlabel('dt', fontsize = 10)
+#    plt.ylabel('E2 - E1', fontsize = 10)
+#    plt.title('E2 - E1 with {} method'.format(method), fontsize = 15)
+#    plt.savefig('figs/{}_energy.pdf'.format(method))
+#    plt.show()
+#
+#
+### Angular momentum:
+#for method in methods:
+#    plt.figure()
+#    plt.semilogx(dt, np.linalg.norm(angular_momentum, axis = 1))
+#    plt.ticklabel_format(axis = 'y', style = 'sci', scilimits=(0,0))
+#    plt.grid()
+#    plt.xlabel('dt', fontsize = 10)
+#    plt.ylabel('L2 - L1', fontsize = 10)
+#    plt.title('L2 - L1 with {} method'.format(method), fontsize = 15)
+#    plt.savefig('figs/{}_angmom.pdf'.format(method))
+#    plt.show()
 
 
 ########## ESCAPE VELOCITY, TASK 3D ###############################
@@ -323,7 +348,7 @@ posS    = np.array([0, 0, 0])
 #
 #velS    = -(massSa*velSa + massM*velM + massE*velE + massJ*velJ + massN*velN \
 #            + massP*velP + massU*velU + massV*velV + massMa*velMa)/massS
-#    
+#
 #Mercury = ss.planets(velM, posM, massM)
 #Earth   = ss.planets(velE, posE, massE)
 #Jupiter = ss.planets(velJ, posJ, massJ)
@@ -352,6 +377,7 @@ posS    = np.array([0, 0, 0])
 
 ############# PRECESSION OF MERCURY, TASK 3F ######################
 
+
 # Speed and position of Mercury at perihelion: 
 #
 #posM    = np.array([0.3075,0,0])
@@ -361,34 +387,21 @@ posS    = np.array([0, 0, 0])
 #N = int(100e7)
 #precession = np.array(ms.velocity_verlet(posM, velM, N, dt))
 #np.save("precession", precession)
-#
-p1 = np.load('textfiles/perihelion_50yrs.npy')
-p2 = np.load('textfiles/precession_not_relativistic_100yrs.npy')
 
+
+p_100 = np.load('textfiles/precession_not_relativistic.npy')
+p_50 = np.load('textfiles/perihelion_50yrs.npy')
+r_100 = np.load('textfiles/precession_not_relativistic_100yrs.npy')
 
 plt.figure()
-plt.plot(np.arctan(p1[:,1]/p1[:,0])*180*3600/np.pi)
+plt.plot(np.arctan(p_100[:, 1]/p_100[:, 0])*180*3600/np.pi, 'b', label = 'corrected Newton, N = 1e8, dt = 1e-6')
+plt.plot(np.arctan(p_50[:, 1]/p_50[:, 0])*180*3600/np.pi, 'k', label = 'corrected Newton, N = 0.5e9, dt = 1e-7')
+plt.plot(np.arctan(r_100[:, 1]/r_100[:, 0])*180*3600/np.pi, 'r', label = 'pure Newtonian, N = 1e8, dt = 1e-6')
+plt.plot(442, 43, 'ro', linewidth = 4, label = 'observed value')
+plt.legend(loc = 'upper left', fontsize = 13)
 plt.grid()
-plt.xlabel('Perihelion points')
-plt.ylabel('Arc seconds')
-plt.savefig('figs/precession.pdf')
-
-#########
-#import Earth_Sun as es
-#
-#
-#posM    = np.array([0.3075,0,0])
-#velM    = np.array([0,12.44,0])
-#
-#velS    = np.array([0,0,0])
-#
-#dt = 1e-7
-#N = int(100e7)
-#
-#Mercury = es.planets(velM, posM, massM)
-#Sun     = es.planets(velS, posS, massS)
-#
-#mer_sun = es.system(Sun, Mercury)
-#mer_sun_solve = es.solver(mer_sun, N, dt)
-#mer_sun_solve.velocity_verlet()
-
+plt.xlabel('No. perihelions', fontsize = 12)
+plt.ylabel('arc seconds', fontsize = 12)
+plt.title('Perihelion precession of Mercury', fontsize = 15)
+plt.savefig('figs/perhelion_precession.pdf')
+plt.show()
