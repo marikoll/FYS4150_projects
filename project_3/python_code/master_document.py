@@ -387,9 +387,9 @@ posS    = np.array([0, 0, 0])
 #N = int(100e7)
 #precession = np.array(ms.velocity_verlet(posM, velM, N, dt))
 #np.save("precession", precession)
-
-
-p_100 = np.load('textfiles/precession_not_relativistic.npy')
+#
+#
+p_100 = np.load('textfiles/precession_relativistic_100yrs.npy')
 p_50 = np.load('textfiles/perihelion_50yrs.npy')
 r_100 = np.load('textfiles/precession_not_relativistic_100yrs.npy')
 
@@ -398,7 +398,7 @@ plt.plot(np.arctan(p_100[:, 1]/p_100[:, 0])*180*3600/np.pi, 'b', label = 'correc
 plt.plot(np.arctan(p_50[:, 1]/p_50[:, 0])*180*3600/np.pi, 'k', label = 'corrected Newton, N = 0.5e9, dt = 1e-7')
 plt.plot(np.arctan(r_100[:, 1]/r_100[:, 0])*180*3600/np.pi, 'r', label = 'pure Newtonian, N = 1e8, dt = 1e-6')
 plt.plot(442, 43, 'ro', linewidth = 4, label = 'observed value')
-plt.legend(loc = 'upper left', fontsize = 13)
+plt.legend(loc = 'upper left', fontsize = 10)
 plt.grid()
 plt.xlabel('No. perihelions', fontsize = 12)
 plt.ylabel('arc seconds', fontsize = 12)
