@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 from Ising_model import MC
 
 
-spins       = 2
-trials      = np.arange(100, 1e6, 5000, np.dtype(np.int64))#[int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
+spins       = 20
+trials      = np.arange(100, 1e6, 1000, np.dtype(np.int64))#[int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
 
 temp = [1.0, 2.4]
 
