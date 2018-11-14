@@ -28,7 +28,7 @@ def initial_energy(spins, temp):
 @numba.njit(cache=True)
 def MC(spins, num_cycles, temperature, ordered = False):#, num_thermalization_steps=0):
     num_spins = len(spins)
-    exp_values = np.zeros((num_cycles, 5))
+    exp_values = np.zeros((int(num_cycles), 5))
     
     E, M = initial_energy(spins, temperature)
     counter_list = np.zeros(num_cycles)
@@ -45,19 +45,19 @@ def MC(spins, num_cycles, temperature, ordered = False):#, num_thermalization_st
 
         delta_energy = (2 * spins[ix, iy] * (left + right + above + below))
         
-        if i > int(num_cycles*0.1):
-            if np.random.random() <= np.exp(-delta_energy / temperature):
-                spins[ix, iy] *= -1.0
-                E += delta_energy
-                M += 2*spins[ix, iy]
-                counter += 1
+ #       if i > int(num_cycles*0.1):
+        if np.random.random() <= np.exp(-delta_energy / temperature):
+            spins[ix, iy] *= -1.0
+            E += delta_energy
+            M += 2*spins[ix, iy]
+            counter += 1
         
-            exp_values[i,0] = E
-            exp_values[i,1] = M
-            exp_values[i,2] = E**2
-            exp_values[i,3] = M**2
-            exp_values[i,4] = np.abs(M)
-            counter_list[i] = counter
+        exp_values[i,0] = E
+        exp_values[i,1] = M
+        exp_values[i,2] = E**2
+        exp_values[i,3] = M**2
+        exp_values[i,4] = np.abs(M)
+        counter_list[i] = counter
         
 
     norm = 1/float(num_cycles)
@@ -81,4 +81,24 @@ def MC(spins, num_cycles, temperature, ordered = False):#, num_thermalization_st
 
     
 if __name__ == "__main__": 
-    pass
+    spins       = 2
+    trials      = [int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
+    temp = 1.0
+#    grid = np.ones((spins, spins))
+#    energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c= MC(grid, trials, temp)
+    sampled_energies = np.zeros(len(trials))
+    sampled_magnets = np.zeros(len(trials))
+    sampled_cv = np.zeros(len(trials))
+    sampled_suscept = np.zeros(len(trials))
+    sampled_absmagn = np.zeros(len(trials))
+    
+    
+    
+    for i in range(len(trials)):
+        grid = np.ones((spins, spins))
+        energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c= MC(grid, trials[i], temp)#, w)
+        sampled_energies[i] = energy_avg
+        sampled_magnets[i] = magnet_avg
+        sampled_cv[i] = C_v
+        sampled_suscept[i] = susceptibility
+        sampled_absmagn[i] = abs_magnet
