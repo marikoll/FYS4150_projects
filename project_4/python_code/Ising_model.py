@@ -81,24 +81,25 @@ def MC(spins, num_cycles, temperature, ordered = False):#, num_thermalization_st
 
     
 if __name__ == "__main__": 
-    spins       = 2
-    trials      = [int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
-    temp = 1.0
-#    grid = np.ones((spins, spins))
+    pass
+#    spins       = 2
+#    trials      = int(1e1)#, int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
+#    temp = 1.0
+#    grid = np.random.choice([-1,1],size=(spins, spins))#np.ones((spins, spins))
 #    energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c= MC(grid, trials, temp)
-    sampled_energies = np.zeros(len(trials))
-    sampled_magnets = np.zeros(len(trials))
-    sampled_cv = np.zeros(len(trials))
-    sampled_suscept = np.zeros(len(trials))
-    sampled_absmagn = np.zeros(len(trials))
-    
-    
-    
-    for i in range(len(trials)):
-        grid = np.ones((spins, spins))
-        energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c= MC(grid, trials[i], temp)#, w)
-        sampled_energies[i] = energy_avg
-        sampled_magnets[i] = magnet_avg
-        sampled_cv[i] = C_v
-        sampled_suscept[i] = susceptibility
-        sampled_absmagn[i] = abs_magnet
+#    sampled_energies = np.zeros(len(trials))
+#    sampled_magnets = np.zeros(len(trials))
+#    sampled_cv = np.zeros(len(trials))
+#    sampled_suscept = np.zeros(len(trials))
+#    sampled_absmagn = np.zeros(len(trials))
+#    
+#    
+#    
+#    for i in range(len(trials)):
+#        grid = np.ones((spins, spins))
+#        energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c= MC(grid, trials[i], temp)#, w)
+#        sampled_energies[i] = energy_avg
+#        sampled_magnets[i] = magnet_avg
+#        sampled_cv[i] = C_v
+#        sampled_suscept[i] = susceptibility
+#        sampled_absmagn[i] = abs_magnet
