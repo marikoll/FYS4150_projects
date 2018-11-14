@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Nov  9 14:44:27 2018
-
-@author: maritkollstuen
-"""
-
 import numpy as np
 import numba
 
@@ -15,16 +7,15 @@ def periodic(i, limit, add):
 
 
 @numba.njit(cache = True)
-def initial_energy(spins, temp, ordered = False):
+def initial_energy(spins, temp):
     E = 0
     M = 0
     num_spins = len(spins)
     
     for i in range(num_spins):
         for j in range(num_spins):
-            if ordered is True: 
-                if (temp < 1.5): 
-                    spins[i, j] = 1
+#            if (temp < 1.5): 
+#                spins[i, j] = 1
             left = spins[i-1, j] if i>0 else spins[num_spins - 1, j]
             above = spins[i, j-1] if j>0 else spins[i, num_spins - 1]
             
@@ -39,8 +30,9 @@ def MC(spins, num_cycles, temperature, ordered = False):#, num_thermalization_st
     num_spins = len(spins)
     exp_values = np.zeros((num_cycles, 5))
     
-    E, M = initial_energy(spins, temperature, ordered)
-
+    E, M = initial_energy(spins, temperature)
+    counter_list = np.zeros(num_cycles)
+    counter = 0
     for i in range(num_cycles):
         ix = np.random.randint(num_spins)
         iy = np.random.randint(num_spins)
@@ -52,16 +44,21 @@ def MC(spins, num_cycles, temperature, ordered = False):#, num_thermalization_st
         below = spins[ix, iy + 1] if iy < (num_spins - 1) else spins[ix, 0]
 
         delta_energy = (2 * spins[ix, iy] * (left + right + above + below))
-        if np.random.random() <= np.exp(-delta_energy / temperature):
-            spins[ix, iy] *= -1.0
-            E += delta_energy
-            M += 2*spins[ix, iy]
         
-        exp_values[i,0] = E
-        exp_values[i,1] = M
-        exp_values[i,2] = E**2
-        exp_values[i,3] = M**2
-        exp_values[i,4] = np.abs(M)
+        if i > int(num_cycles*0.1):
+            if np.random.random() <= np.exp(-delta_energy / temperature):
+                spins[ix, iy] *= -1.0
+                E += delta_energy
+                M += 2*spins[ix, iy]
+                counter += 1
+        
+            exp_values[i,0] = E
+            exp_values[i,1] = M
+            exp_values[i,2] = E**2
+            exp_values[i,3] = M**2
+            exp_values[i,4] = np.abs(M)
+            counter_list[i] = counter
+        
 
     norm = 1/float(num_cycles)
     
@@ -78,11 +75,10 @@ def MC(spins, num_cycles, temperature, ordered = False):#, num_thermalization_st
     magnet_avg = magnet_avg/num_spins**2
     C_v = energy_var/temperature**2
     susceptibility = magnet_var/temperature
-    abs_magnet = magnet_avg/num_spins
+    abs_magnet = magnet_absavg/num_spins**2
 
-    return energy_avg, magnet_avg, C_v, susceptibility, abs_magnet
+    return energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, counter_list
 
     
 if __name__ == "__main__": 
     pass
-        
