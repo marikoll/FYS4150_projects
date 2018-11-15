@@ -30,31 +30,32 @@ def MC(spins, num_cycles, temperature, cumsum = False):
     counter_list = np.zeros(num_cycles)
     counter = 0
     for i in range(num_cycles):
-        ix = np.random.randint(num_spins)
-        iy = np.random.randint(num_spins)
-
-        left = spins[ix - 1, iy] if ix > 0 else spins[num_spins - 1, iy]
-        right = spins[ix + 1, iy] if ix < (num_spins - 1) else spins[0, iy]
-
-        above = spins[ix, iy - 1] if iy > 0 else spins[ix, num_spins - 1]
-        below = spins[ix, iy + 1] if iy < (num_spins - 1) else spins[ix, 0]
-
-        delta_energy = (2 * spins[ix, iy] * (left + right + above + below))
-
-        if np.random.random() <= np.exp(-delta_energy / temperature):
-            spins[ix, iy] *= -1.0
+        for j in range(num_spins**2):
+            ix = np.random.randint(num_spins)
+            iy = np.random.randint(num_spins)
+    
+            left = spins[ix - 1, iy] if ix > 0 else spins[num_spins - 1, iy]
+            right = spins[ix + 1, iy] if ix < (num_spins - 1) else spins[0, iy]
+    
+            above = spins[ix, iy - 1] if iy > 0 else spins[ix, num_spins - 1]
+            below = spins[ix, iy + 1] if iy < (num_spins - 1) else spins[ix, 0]
+    
+            delta_energy = (2 * spins[ix, iy] * (left + right + above + below))
+    
+            if np.random.random() <= np.exp(-delta_energy / temperature):
+                spins[ix, iy] *= -1.0
+                
+    
+                E += delta_energy
+                M += 2*spins[ix, iy]
+                counter += 1
             
-
-            E += delta_energy
-            M += 2*spins[ix, iy]
-            counter += 1
-        
-        exp_values[i,0] = E
-        exp_values[i,1] = M
-        exp_values[i,2] = E**2
-        exp_values[i,3] = M**2
-        exp_values[i,4] = np.abs(M)
-        counter_list[i] = counter
+            exp_values[i,0] = E
+            exp_values[i,1] = M
+            exp_values[i,2] = E**2
+            exp_values[i,3] = M**2
+            exp_values[i,4] = np.abs(M)
+            counter_list[i] = counter
         
     energy_avg = np.cumsum(exp_values[:,0])/np.arange(1, num_cycles +1)
     magnet_avg = np.cumsum(exp_values[:,1])/np.arange(1, num_cycles +1)
@@ -85,31 +86,32 @@ def MC_cutoff(spins, num_cycles, temperature, P):
     E, M = initial_energy(spins, temperature)
 
     for i in range(num_cycles):
-        ix = np.random.randint(num_spins)
-        iy = np.random.randint(num_spins)
-
-        left = spins[ix - 1, iy] if ix > 0 else spins[num_spins - 1, iy]
-        right = spins[ix + 1, iy] if ix < (num_spins - 1) else spins[0, iy]
-
-        above = spins[ix, iy - 1] if iy > 0 else spins[ix, num_spins - 1]
-        below = spins[ix, iy + 1] if iy < (num_spins - 1) else spins[ix, 0]
-
-        delta_energy = (2 * spins[ix, iy] * (left + right + above + below))
-
-        
-        if np.random.random() <= np.exp(-delta_energy / temperature):
-            spins[ix, iy] *= -1.0
+        for j in range(num_spins**2):
+            ix = np.random.randint(num_spins)
+            iy = np.random.randint(num_spins)
+    
+            left = spins[ix - 1, iy] if ix > 0 else spins[num_spins - 1, iy]
+            right = spins[ix + 1, iy] if ix < (num_spins - 1) else spins[0, iy]
+    
+            above = spins[ix, iy - 1] if iy > 0 else spins[ix, num_spins - 1]
+            below = spins[ix, iy + 1] if iy < (num_spins - 1) else spins[ix, 0]
+    
+            delta_energy = (2 * spins[ix, iy] * (left + right + above + below))
+    
             
-
-            E += delta_energy
-            M += 2*spins[ix, iy]
-
-        if i >= sampling_starts_from:
-            exp_values[i,0] = E
-            exp_values[i,1] = M
-            exp_values[i,2] = E**2
-            exp_values[i,3] = M**2
-            exp_values[i,4] = np.abs(M)
+            if np.random.random() <= np.exp(-delta_energy / temperature):
+                spins[ix, iy] *= -1.0
+                
+    
+                E += delta_energy
+                M += 2*spins[ix, iy]
+    
+            if i >= sampling_starts_from:
+                exp_values[i,0] = E
+                exp_values[i,1] = M
+                exp_values[i,2] = E**2
+                exp_values[i,3] = M**2
+                exp_values[i,4] = np.abs(M)
 
         
 

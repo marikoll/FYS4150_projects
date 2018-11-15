@@ -8,11 +8,11 @@ from Ising_model import MC_cutoff
 
 
 spins       = 20
-trials      = int(1e7)# np.logspace(2, 7, 500, base = 10.0, dtype = np.dtype(np.int64)) #, np.dtype(np.int64))#[int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
+trials      = int(1e6)# np.logspace(2, 7, 500, base = 10.0, dtype = np.dtype(np.int64)) #, np.dtype(np.int64))#[int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
 
 temp = [1.0, 2.4]
 
-p = [0.3, 0.1]
+p = [0.0015, 0.0025]
 
 
 
@@ -22,7 +22,7 @@ sampled_energies = np.zeros((trials, len(temp)))
 start = time.time()
 
 
-for k, T in enumerate(p):
+for k, T in enumerate(temp):
     grid = np.random.choice([-1,1],size=(spins, spins))
     energy_avg, magnet_avg, C_v, susceptibility, abs_magnet,\
         sampling_starts_from = MC_cutoff(grid, trials, T, P = p[k])
