@@ -2,9 +2,6 @@ import numpy as np
 import numba
 
 
-def periodic(i, limit, add):
-    return (i + limit + add) % limit
-
 
 @numba.njit(cache = True)
 def initial_energy(spins, temp):

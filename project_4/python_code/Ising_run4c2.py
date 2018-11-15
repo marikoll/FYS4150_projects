@@ -14,7 +14,7 @@ from Ising_model import MC
 
 
 spins       = 20
-trials      = np.arange(100, 1e6, 5000, np.dtype(np.int64))#[int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
+trials      = np.logspace(100, 1e6, 10) #, np.dtype(np.int64))#[int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
 
 temp = [1.0, 2.4]
 
@@ -37,7 +37,7 @@ start = time.time()
 for k in range(len(temp)):
     for i in range(len(trials)):
         grid = np.random.choice([-1,1],size=(spins, spins))
-        energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, counter_list = MC(grid, trials[i], temp[k])
+        energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, counter_list = MC(grid, int(trials[i]), temp[k])
         if i >Temp:
             sampled_energies[i - Temp, k] = energy_avg
             sampled_magnets[i - Temp, k] = np.abs(magnet_avg)
