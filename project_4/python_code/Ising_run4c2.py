@@ -10,11 +10,11 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 
-from Ising_model import MC
+from Ising_model import MC_cutoff
 
 
 spins       = 20
-trials      = np.logspace(100, 1e6, 10) #, np.dtype(np.int64))#[int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
+trials      = np.logspace(2, 7, 100, base = 10.0, dtype = np.dtype(np.int64)) #, np.dtype(np.int64))#[int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
 
 temp = [1.0, 2.4]
 
@@ -37,7 +37,7 @@ start = time.time()
 for k in range(len(temp)):
     for i in range(len(trials)):
         grid = np.random.choice([-1,1],size=(spins, spins))
-        energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, counter_list = MC(grid, int(trials[i]), temp[k])
+        energy_avg, magnet_avg, C_v, susceptibility, abs_magnet = MC_cutoff(grid, int(trials[i]), temp[k],  P = p)
         if i >Temp:
             sampled_energies[i - Temp, k] = energy_avg
             sampled_magnets[i - Temp, k] = np.abs(magnet_avg)
@@ -76,23 +76,37 @@ print('CPU: ', stop-start)
 
 ## Expectation values for E and M
 
+
+
 plt.figure()
-ax1 = plt.subplot(211)
-ax1.set_title('Expectation values for energy and magnetization as functions of MC-cycles, T = 1', fontsize = 12)
-ax1.plot(trials[Temp+1:], sampled_energies[1:,0], 'r--', label= 'T = 1.0')
-ax1.plot(trials[Temp+1:], sampled_energies[1:,1], 'b--', label = 'T = 2.4')
-ax1.legend()
-ax1.set_ylabel(r'$\langle E \rangle$', fontsize = 10)
-ax1.grid()
-ax2 = plt.subplot(212)
-ax2.plot(trials[Temp+1:], sampled_absmagn[1:,0], 'r--', label = 'T = 1.0')
-ax2.plot(trials[Temp+1:], sampled_absmagn[1:,1], 'b--', label = 'T = 2.4')
-ax2.legend()
-ax2.set_ylabel(r'$\langle |M|\rangle$', fontsize = 10)
-ax2.set_xlabel('MC-cycles', fontsize = 10)
-ax2.grid()
-#plt.savefig('figs/expectations_2020lattice_t1.pdf', bbox_inches = 'tight')
-plt.show()
+plt.hist([sampled_energies[:,0]],
+    bins = 50, density = 10)
+plt.title('Energy distribution with T = 1')
+
+plt.figure()
+plt.hist([sampled_energies[:,1]],
+    bins = 50, density = 10)
+plt.title('Energy distribution with T = 2.4')
+
+
+
+#plt.figure()
+#ax1 = plt.subplot(211)
+#ax1.set_title('Expectation values for energy and magnetization as functions of MC-cycles, T = 1', fontsize = 12)
+#ax1.semilogx(trials[Temp+1:], sampled_energies[1:,0], 'r', label= 'T = 1.0')
+#ax1.semilogx(trials[Temp+1:], sampled_energies[1:,1], 'b', label = 'T = 2.4')
+#ax1.legend()
+#ax1.set_ylabel(r'$\langle E \rangle$', fontsize = 10)
+#ax1.grid()
+#ax2 = plt.subplot(212)
+#ax2.semilogx(trials[Temp+1:], sampled_absmagn[1:,0], 'r', label = 'T = 1.0')
+#ax2.semilogx(trials[Temp+1:], sampled_absmagn[1:,1], 'b', label = 'T = 2.4')
+#ax2.legend()
+#ax2.set_ylabel(r'$\langle |M|\rangle$', fontsize = 10)
+#ax2.set_xlabel('MC-cycles', fontsize = 10)
+#ax2.grid()
+##plt.savefig('figs/expectations_2020lattice_t1.pdf', bbox_inches = 'tight')
+#plt.show()
 
 
 #plt.figure()

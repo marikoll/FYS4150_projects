@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov 14 17:23:10 2018
-
-@author: maritkollstuen
+Accepted states - task 4c)
 """
 import numpy as np
 import time

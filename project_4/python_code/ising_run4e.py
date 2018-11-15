@@ -16,7 +16,7 @@ from Ising_model import MC
 spins       = [40, 60, 80, 100]
 trials      = int(1e7)
 
-temp = np.arange(2.1, 2.35, 0.05)
+temp = np.arange(2.0, 2.4, 0.01)
 
 sampled_energies = np.zeros((len(spins), len(temp)))
 sampled_magnets = np.zeros((len(spins), len(temp)))
@@ -26,16 +26,23 @@ sampled_absmagn = np.zeros((len(spins), len(temp)))
 
 start = time.time()
 
-
+#fig1 = plt.figure(1)
+#fig2 = plt.figure(2)
+#fig3 = plt.figure(3)
+#fig4 = plt.figure(4)
 for k in range(len(temp)):
     for i in range(len(spins)):
-        grid = grid = np.ones((spins[i], spins[i]))
+        grid = np.ones((spins[i], spins[i]))
         energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c = MC(grid, trials, temp[k])
-        sampled_energies[i, k] = energy_avg
-        sampled_magnets[i, k] = np.abs(magnet_avg)
+#        plt.plot(temp, energy_avg, label = 'L{}'.format(spins[i]))
+#        plt.plot(temp, abs_magnet, label = 'L{}'.format(spins[i]))
+#        plt.plot(temp, C_v, label = 'L{}'.format(spins[i]))
+#        plt.plot(temp, susceptibility, label = 'L{}'.format(spins[i]))
+        sampled_energies[i, k] = energy_avg[-1]
         sampled_cv[i, k] = C_v
         sampled_suscept[i, k] = susceptibility
-        sampled_absmagn[i, k] = abs_magnet
+        sampled_absmagn[i, k] = abs_magnet[-1]
+        
         
 
         

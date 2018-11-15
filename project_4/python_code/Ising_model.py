@@ -11,8 +11,6 @@ def initial_energy(spins, temp):
     
     for i in range(num_spins):
         for j in range(num_spins):
-#            if (temp < 1.5): 
-#                spins[i, j] = 1
             left = spins[i-1, j] if i>0 else spins[num_spins - 1, j]
             above = spins[i, j-1] if j>0 else spins[i, num_spins - 1]
             
@@ -23,8 +21,9 @@ def initial_energy(spins, temp):
 
 
 @numba.njit(cache=True)
-def MC(spins, num_cycles, temperature, ordered = False):#, num_thermalization_steps=0):
+def MC(spins, num_cycles, temperature, cumsum = False):
     num_spins = len(spins)
+
     exp_values = np.zeros((int(num_cycles), 5))
     
     E, M = initial_energy(spins, temperature)
@@ -41,10 +40,11 @@ def MC(spins, num_cycles, temperature, ordered = False):#, num_thermalization_st
         below = spins[ix, iy + 1] if iy < (num_spins - 1) else spins[ix, 0]
 
         delta_energy = (2 * spins[ix, iy] * (left + right + above + below))
-        
- #       if i > int(num_cycles*0.1):
+
         if np.random.random() <= np.exp(-delta_energy / temperature):
             spins[ix, iy] *= -1.0
+            
+
             E += delta_energy
             M += 2*spins[ix, iy]
             counter += 1
@@ -56,17 +56,14 @@ def MC(spins, num_cycles, temperature, ordered = False):#, num_thermalization_st
         exp_values[i,4] = np.abs(M)
         counter_list[i] = counter
         
+    energy_avg = np.cumsum(exp_values[:,0])/np.arange(1, num_cycles +1)
+    magnet_avg = np.cumsum(exp_values[:,1])/np.arange(1, num_cycles +1)
 
-    norm = 1/float(num_cycles)
-    
-    energy_avg = np.sum(exp_values[:,0])*norm
-    magnet_avg = np.sum(exp_values[:,1])*norm
-    energy2_avg = np.sum(exp_values[:,2])*norm
-    magnet2_avg = np.sum(exp_values[:,3])*norm
-    magnet_absavg = np.sum(exp_values[:,4])*norm
-    
-    energy_var = (energy2_avg - energy_avg**2)/(num_spins**2)#**2*temperature**2)
-    magnet_var = (magnet2_avg - magnet_absavg**2)/(num_spins**2)#**2*temperature**2)
+    energy2_avg = np.cumsum(exp_values[:,2])/np.arange(1, num_cycles +1)
+    magnet2_avg = np.cumsum(exp_values[:,3])/np.arange(1, num_cycles +1)
+    magnet_absavg = np.cumsum(exp_values[:,4])/np.arange(1, num_cycles +1)
+    energy_var = (energy2_avg[-1] - energy_avg[-1]**2)/(num_spins**2)
+    magnet_var = (magnet2_avg[-1] - magnet_avg[-1]**2)/(num_spins**2)
     
     energy_avg = energy_avg/num_spins**2
     magnet_avg = magnet_avg/num_spins**2
@@ -74,7 +71,63 @@ def MC(spins, num_cycles, temperature, ordered = False):#, num_thermalization_st
     susceptibility = magnet_var/temperature
     abs_magnet = magnet_absavg/num_spins**2
 
+
     return energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, counter_list
+
+
+@numba.njit(cache=True)
+def MC_cutoff(spins, num_cycles, temperature, P):
+    num_spins = len(spins)
+
+    exp_values = np.zeros((int(num_cycles), 5))
+    sampling_starts_from = int(num_cycles*(P)-1)
+    
+    E, M = initial_energy(spins, temperature)
+
+    for i in range(num_cycles):
+        ix = np.random.randint(num_spins)
+        iy = np.random.randint(num_spins)
+
+        left = spins[ix - 1, iy] if ix > 0 else spins[num_spins - 1, iy]
+        right = spins[ix + 1, iy] if ix < (num_spins - 1) else spins[0, iy]
+
+        above = spins[ix, iy - 1] if iy > 0 else spins[ix, num_spins - 1]
+        below = spins[ix, iy + 1] if iy < (num_spins - 1) else spins[ix, 0]
+
+        delta_energy = (2 * spins[ix, iy] * (left + right + above + below))
+
+        
+        if np.random.random() <= np.exp(-delta_energy / temperature):
+            spins[ix, iy] *= -1.0
+            
+
+            E += delta_energy
+            M += 2*spins[ix, iy]
+
+        if i >= sampling_starts_from:
+            exp_values[i,0] = E
+            exp_values[i,1] = M
+            exp_values[i,2] = E**2
+            exp_values[i,3] = M**2
+            exp_values[i,4] = np.abs(M)
+
+        
+
+    energy_avg = np.cumsum(exp_values[:,0])/np.arange(1, num_cycles +1)
+    magnet_avg = np.cumsum(exp_values[:,1])/np.arange(1, num_cycles +1)
+    energy2_avg = np.cumsum(exp_values[:,2])/np.arange(1, num_cycles +1)
+    magnet2_avg = np.cumsum(exp_values[:,3])/np.arange(1, num_cycles +1)
+    magnet_absavg = np.cumsum(exp_values[:,4])/np.arange(1, num_cycles +1)
+    energy_var = (energy2_avg[-1] - energy_avg[-1]**2)/(num_spins**2)
+    magnet_var = (magnet2_avg[-1] - magnet_avg[-1]**2)/(num_spins**2)
+    
+    energy_avg = energy_avg/num_spins**2
+    magnet_avg = magnet_avg/num_spins**2
+    C_v = energy_var/temperature**2
+    susceptibility = magnet_var/temperature
+    abs_magnet = magnet_absavg/num_spins**2
+
+    return energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, sampling_starts_from
 
     
 if __name__ == "__main__": 
