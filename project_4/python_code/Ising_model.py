@@ -21,7 +21,7 @@ def initial_energy(spins, temp):
 
 
 @numba.njit(cache=True)
-def MC(spins, num_cycles, temperature, cumsum = False):
+def MC(spins, num_cycles, temperature):
     num_spins = len(spins)
 
     exp_values = np.zeros((int(num_cycles), 5))
@@ -114,7 +114,7 @@ def MC_cutoff(spins, num_cycles, temperature, P):
                 exp_values[i,4] = np.abs(M)
 
         
-
+    En = exp_values[:,0]/num_spins**2
     energy_avg = np.cumsum(exp_values[:,0])/np.arange(1, num_cycles +1)
     magnet_avg = np.cumsum(exp_values[:,1])/np.arange(1, num_cycles +1)
     energy2_avg = np.cumsum(exp_values[:,2])/np.arange(1, num_cycles +1)
@@ -129,7 +129,7 @@ def MC_cutoff(spins, num_cycles, temperature, P):
     susceptibility = magnet_var/temperature
     abs_magnet = magnet_absavg/num_spins**2
 
-    return energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, sampling_starts_from
+    return En, energy_avg, magnet_avg, C_v, susceptibility, abs_magnet
 
     
 if __name__ == "__main__": 

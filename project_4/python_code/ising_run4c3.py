@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 from Ising_model import MC
 
 spins       = 20
-trials      = int(1e6)#np.arange(100, 1e6, 5000, np.dtype(np.int64))
+trials      = int(1e4)#np.arange(100, 1e6, 5000, np.dtype(np.int64))
 
 temp = [1.0, 2.4]
 
-sampled_count = np.zeros((int(1e6), len(temp)))
+sampled_count = np.zeros((int(1e4), len(temp)))
 
 start = time.time()
 
@@ -23,7 +23,7 @@ for k in range(len(temp)):
     energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, counter_list = MC(grid, trials, temp[k])
     sampled_count[:, k] = counter_list
 
-o_sampled_count = np.zeros((int(1e6), len(temp)))
+o_sampled_count = np.zeros((int(1e4), len(temp)))
 for k in range(len(temp)):
     grid = np.ones((spins, spins))
     energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, counter_list = MC(grid, trials, temp[k])
