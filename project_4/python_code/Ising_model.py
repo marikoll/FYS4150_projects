@@ -81,7 +81,7 @@ def MC_cutoff(spins, num_cycles, temperature, P):
     num_spins = len(spins)
 
     exp_values = np.zeros((int(num_cycles), 5))
-    sampling_starts_from = int(num_cycles*(P)-1)
+    sampling_starts_from = int(num_cycles*(P))
     
     E, M = initial_energy(spins, temperature)
 
@@ -129,7 +129,7 @@ def MC_cutoff(spins, num_cycles, temperature, P):
     susceptibility = magnet_var/temperature
     abs_magnet = magnet_absavg/num_spins**2
 
-    return En, energy_avg, magnet_avg, C_v, susceptibility, abs_magnet
+    return En,energy_var, energy_avg, magnet_avg, C_v, susceptibility, abs_magnet
 
     
 if __name__ == "__main__": 
