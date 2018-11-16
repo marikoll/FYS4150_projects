@@ -8,7 +8,6 @@ Created on Sun Nov 11 14:15:51 2018
 
 import numpy as np
 import time
-#import matplotlib.pyplot as plt
 
 from Ising_model import MC
 
