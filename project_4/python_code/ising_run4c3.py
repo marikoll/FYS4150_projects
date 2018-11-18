@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Accepted states - task 4c)
+Checks and plots number of accepted states for a 20x20 lattice for temperature 
+T = 1.0 and T = 2.4 with ordered (i.e all spins up) and unordered configuration
 """
 import numpy as np
 import time
