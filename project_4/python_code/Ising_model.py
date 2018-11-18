@@ -1,10 +1,26 @@
+"""
+Two - dimensional Ising model 
+"""
+
+
 import numpy as np
 import numba
 
 
 
 @numba.njit(cache = True)
-def initial_energy(spins, temp):
+def initialization(spins):
+    """
+    Function that computes the initial energy and magnetization based on 
+    the configuration of the input matrix. 
+    
+    Input: 
+        spins   - <np.ndarray> matrix of sixe (spins x spins)
+    
+    Output: 
+        E       - <float64> energy of initial configuration
+        M       - <float64> magnetization of initial configuration
+    """
     E = 0
     M = 0
     num_spins = len(spins)
@@ -22,11 +38,29 @@ def initial_energy(spins, temp):
 
 @numba.njit(cache=True)
 def MC(spins, num_cycles, temperature):
+    """
+    Monte-Carlo algorithm for solving the Ising model with implemented Markov
+    chain and Metropolis algorithm.
+    
+    Input: 
+        spins       - <int> matrix of sixe (spins x spins)
+        num_cycles  - <int> number of Monte-Carlo cycles
+        temperature - <float> temperature of the system in units JT/k_B
+        
+    Output: 
+        energy_avg      - <float64> expectation values of the energy
+        magnet_avg      - <float64> expectation values of the  magnetization
+        C_v             - <float> heat capacity
+        susceptibility  - <float> susceptibility
+        abs_magnet      - <float64> expectation values of the absolute 
+                                    magnetization
+        counter_list    - <float64> number of accepted states
+    """
     num_spins = len(spins)
 
     exp_values = np.zeros((int(num_cycles), 5))
     
-    E, M = initial_energy(spins, temperature)
+    E, M = initialization(spins)
     counter_list = np.zeros(num_cycles)
     counter = 0
     for i in range(num_cycles):
@@ -41,7 +75,8 @@ def MC(spins, num_cycles, temperature):
             below = spins[ix, iy + 1] if iy < (num_spins - 1) else spins[ix, 0]
     
             delta_energy = (2 * spins[ix, iy] * (left + right + above + below))
-    
+            
+            # Metropolis: 
             if np.random.random() <= np.exp(-delta_energy / temperature):
                 spins[ix, iy] *= -1.0
                 
@@ -78,12 +113,33 @@ def MC(spins, num_cycles, temperature):
 
 @numba.njit(cache=True)
 def MC_cutoff(spins, num_cycles, temperature, P):
+    """
+    Monte-Carlo algorithm for solving the Ising model with implemented Markov
+    chain and Metropolis algorithm. With cutoff percentage meaning that the 
+    algorithm will not sample until the percentage of cycles are performed
+    
+    Input: 
+        spins       - <int> matrix of sixe (spins x spins)
+        num_cycles  - <int> number of Monte-Carlo cycles
+        temperature - <float> temperature of the system in units JT/k_B
+        P           - <float> cutoff percentage
+        
+    Output: 
+        energy          - <float64> energy of the system
+        energy_var      - <float> variance of the system
+        energy_avg      - <float64> expectation values of the energy
+        magnet_avg      - <float64> expectation values of the  magnetization
+        C_v             - <float> heat capacity
+        susceptibility  - <float> susceptibility
+        abs_magnet      - <float64> expectation values of the absolute 
+                                    magnetization
+    """
     num_spins = len(spins)
 
     exp_values = np.zeros((int(num_cycles), 5))
     sampling_starts_from = int(num_cycles*(P))
     
-    E, M = initial_energy(spins, temperature)
+    E, M = initialization(spins)
 
     for i in range(num_cycles):
         for j in range(num_spins**2):
@@ -114,7 +170,7 @@ def MC_cutoff(spins, num_cycles, temperature, P):
                 exp_values[i,4] = np.abs(M)
 
         
-    En = exp_values[:,0]/num_spins**2
+    energy = exp_values[:,0]/num_spins**2
     energy_avg = np.cumsum(exp_values[:,0])/np.arange(1, num_cycles +1)
     magnet_avg = np.cumsum(exp_values[:,1])/np.arange(1, num_cycles +1)
     energy2_avg = np.cumsum(exp_values[:,2])/np.arange(1, num_cycles +1)
@@ -129,29 +185,8 @@ def MC_cutoff(spins, num_cycles, temperature, P):
     susceptibility = magnet_var/temperature
     abs_magnet = magnet_absavg/num_spins**2
 
-    return En,energy_var, energy_avg, magnet_avg, C_v, susceptibility, abs_magnet
+    return energy, energy_var, energy_avg, magnet_avg, C_v, susceptibility, abs_magnet
 
     
 if __name__ == "__main__": 
     pass
-#    spins       = 2
-#    trials      = int(1e1)#, int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
-#    temp = 1.0
-#    grid = np.random.choice([-1,1],size=(spins, spins))#np.ones((spins, spins))
-#    energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c= MC(grid, trials, temp)
-#    sampled_energies = np.zeros(len(trials))
-#    sampled_magnets = np.zeros(len(trials))
-#    sampled_cv = np.zeros(len(trials))
-#    sampled_suscept = np.zeros(len(trials))
-#    sampled_absmagn = np.zeros(len(trials))
-#    
-#    
-#    
-#    for i in range(len(trials)):
-#        grid = np.ones((spins, spins))
-#        energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c= MC(grid, trials[i], temp)#, w)
-#        sampled_energies[i] = energy_avg
-#        sampled_magnets[i] = magnet_avg
-#        sampled_cv[i] = C_v
-#        sampled_suscept[i] = susceptibility
-#        sampled_absmagn[i] = abs_magnet
