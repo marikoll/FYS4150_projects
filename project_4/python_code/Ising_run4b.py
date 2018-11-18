@@ -8,6 +8,7 @@ Created on Sun Nov 11 14:15:51 2018
 
 import numpy as np
 import time
+from numba import prange
 
 from Ising_model import MC
 
@@ -21,7 +22,7 @@ temp = 1.0
 start = time.time()
 
 
-for i in range(len(trials)):
+for i in prange(len(trials)):
     grid = np.ones((spins, spins))
     energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c= MC(grid, trials[i], temp)
     print('MC-cycles: {}\n<E>: {:.4f}\n<M>: {:.4f}\nC_v: {:.4f}\nchi: {:.4f}\n\n'.\

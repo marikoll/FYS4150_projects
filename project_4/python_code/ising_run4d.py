@@ -13,7 +13,7 @@ trials      = int(1e6)# np.logspace(2, 7, 500, base = 10.0, dtype = np.dtype(np.
 
 temp = [1.0, 2.4]
 
-p = [0.001, 0.1]
+p = [0.01, 0.1]
 
 
 
