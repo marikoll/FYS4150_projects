@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Plots the energy distribution for a 20x20 lattice in 1e6 MC-cycles for 
 temperature T = 1.0 and T = 2.4 and belonging percentage-cutoffs. 
