@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Expectation values as funct. of MC-cycles
+Calculates and plots expectation values as function of MC-cycles for a 
+20x20 lattice with temperature T = 1.0 and T = 2.4
 """
 
 import numpy as np
+from numba import prange
 import time
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
@@ -14,7 +16,7 @@ from Ising_model import MC
 
 
 spins       = 20
-trials      = int(1e6)# np.logspace(2, 7, 100, base = 10.0, dtype = np.dtype(np.int64))
+trials      = int(1e6)
 
 temp = [1.0, 2.4]
 
@@ -27,10 +29,9 @@ sampled_absmagn = np.zeros((trials, len(temp)))
 start = time.time()
 
 
-for k in range(len(temp)):
-#    for i in range(len(trials)):
+for k in prange(len(temp)):
     grid = np.random.choice([-1,1],size=(spins, spins))
-    energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c = MC(grid, trials, temp[k])#, cumsum = True)
+    energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c = MC(grid, trials, temp[k])
     sampled_energies[:, k] = energy_avg
     sampled_absmagn[:, k] = abs_magnet
 
@@ -40,10 +41,10 @@ o_sampled_energies = np.zeros((trials, len(temp)))
 o_sampled_absmagn = np.zeros((trials, len(temp)))
 
 
-for k in range(len(temp)):
+for k in prange(len(temp)):
 #    for i in range(len(trials)):
     grid = np.ones((spins, spins))
-    energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c = MC(grid, trials, temp[k])#, cumsum = True)
+    energy_avg, magnet_avg, C_v, susceptibility, abs_magnet, c = MC(grid, trials, temp[k])
     o_sampled_energies[:, k] = energy_avg
     o_sampled_absmagn[:, k] = abs_magnet
 
@@ -66,8 +67,8 @@ ax.set_ylabel(r'$\langle E\rangle$', fontsize = 10)
 axins = zoomed_inset_axes(ax, 19, loc=1)
 axins.plot(T, o_sampled_energies[::10,0], 'r')
 axins.plot(T, sampled_energies[::10,0], 'b')
-x1, x2, y1, y2 = 0, 10000, -2.01, -1.95 # specify the limits
-axins.set_xlim(x1, x2) # apply the x-limits
+x1, x2, y1, y2 = 0, 10000, -2.01, -1.95 
+axins.set_xlim(x1, x2) 
 axins.set_ylim(y1, y2)
 mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5")
 plt.savefig('figs/expectations_2020lattice_temp1_energy.pdf', bbox_inches = 'tight')
@@ -85,8 +86,8 @@ ax.set_ylabel(r'$\langle |M|\rangle$', fontsize = 10)
 axins = zoomed_inset_axes(ax, 11, loc=7)
 axins.plot(T, o_sampled_absmagn[::10,0], 'r')
 axins.plot(T, sampled_absmagn[::10,0], 'b')
-x1, x2, y1, y2 = -10, 15000, 0.94, 1.01 # specify the limits
-axins.set_xlim(x1, x2) # apply the x-limits
+x1, x2, y1, y2 = -10, 15000, 0.94, 1.01
+axins.set_xlim(x1, x2) 
 axins.set_ylim(y1, y2)
 mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5")
 plt.savefig('figs/expectations_2020lattice_temp1_magnet.pdf', bbox_inches = 'tight')
@@ -104,8 +105,8 @@ ax.set_ylabel(r'$\langle E\rangle$', fontsize = 10)
 axins = zoomed_inset_axes(ax, 8, loc=7)
 axins.plot(T, o_sampled_energies[::10,1], 'r')
 axins.plot(T, sampled_energies[::10,1], 'b')
-x1, x2, y1, y2 = 0, 55000, -1.3, -1.2 # specify the limits
-axins.set_xlim(x1, x2) # apply the x-limits
+x1, x2, y1, y2 = 0, 55000, -1.3, -1.2 
+axins.set_xlim(x1, x2) 
 axins.set_ylim(y1, y2)
 mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5")
 plt.savefig('figs/expectations_2020lattice_temp24_energy.pdf', bbox_inches = 'tight')
@@ -123,8 +124,8 @@ ax.set_ylabel(r'$\langle |M|\rangle$', fontsize = 10)
 axins = zoomed_inset_axes(ax, 4, loc=7)
 axins.plot(T, o_sampled_absmagn[::10,1], 'r')
 axins.plot(T, sampled_absmagn[::10,1], 'b')
-x1, x2, y1, y2 = -10, 170000, 0.4, 0.56 # specify the limits
-axins.set_xlim(x1, x2) # apply the x-limits
+x1, x2, y1, y2 = -10, 170000, 0.4, 0.56
+axins.set_xlim(x1, x2) 
 axins.set_ylim(y1, y2)
 mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5")
 plt.savefig('figs/expectations_2020lattice_temp24_magnet.pdf', bbox_inches = 'tight')

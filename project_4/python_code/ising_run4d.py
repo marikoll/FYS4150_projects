@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Plots the energy distribution for a 20x20 lattice in 1e6 MC-cycles for 
+temperature T = 1.0 and T = 2.4 and belonging percentage-cutoffs. 
+"""
+
 
 import numpy as np
 import time
@@ -9,11 +16,11 @@ from Ising_model import MC_cutoff
 
 
 spins       = 20
-trials      = int(1e6)# np.logspace(2, 7, 500, base = 10.0, dtype = np.dtype(np.int64)) #, np.dtype(np.int64))#[int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7)]
+trials      = int(1e6)
 
 temp = [1.0, 2.4]
 
-p = [0.001, 0.1]
+p = [0.01, 0.1]
 
 
 
