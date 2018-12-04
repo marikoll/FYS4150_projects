@@ -41,6 +41,7 @@ def periodic_matrix(n_rows, n_cols):
 def euler(N_x, dx, T, dt):
     psi_0, zeta_0 = initialize(N_x, dx)
     alpha = dt/(2*dx)
+    dx2 = dx**2
     
     psi_prev = np.zeros(N_x)
     psi_curr = np.zeros(N_x)
@@ -62,18 +63,19 @@ def euler(N_x, dx, T, dt):
     while t < T:
         #forward Euler:
         for i in range(1, N_x-1):
-            zeta_curr[i] = zeta_prev[i] - alpha*(psi_prev[i+1] - psi_prev[i-1])
+            zeta_curr[i] = zeta_prev[i] + alpha*(psi_prev[i+1] - psi_prev[i-1])
             
-        zeta_curr[0] = zeta_prev[0] - alpha*(psi_prev[1] - psi_prev[N_x -2])
+        zeta_curr[0] = zeta_prev[0] + alpha*(psi_prev[1] - psi_prev[N_x -2])
         zeta_curr[N_x-1] = zeta_curr[0]
 
         for i in range(0, N_x-1):
-            rhs_poisson[i-1] = -dx**2*zeta_curr[i]
-
-
+            rhs_poisson[i] = -dx2*zeta_curr[i]
+        print(psi_curr[1:3])
+        print('----')
         psi_curr = np.linalg.solve(A, rhs_poisson)
         
-        psi_curr[N_x-2] = psi_curr[0]
+        print(psi_curr[1:3])
+        psi_curr[-1] = psi_curr[0]
         
         for i in range(0, N_x-1):
             psi_prev[i] = psi_curr[i]
@@ -91,6 +93,7 @@ def leapfrog(N_x, dx, T, dt):
     psi_0, zeta_0 = initialize(N_x, dx)
     alpha = dt/(2*dx)
     gamma =  dt/dx
+    dx2 = dx**2
     
     psi_prev = np.zeros(N_x)
     psi_curr = np.zeros(N_x)
@@ -103,20 +106,21 @@ def leapfrog(N_x, dx, T, dt):
     A = periodic_matrix(int(N_x-1),int(N_x-1))
     
     psi_prev  = psi_0
-    zeta_prev = zeta_0
-    
+    zeta_pp = zeta_0
+
     #initial Euler:
     for i in range(1, N_x-1):
         zeta_prev[i] = zeta_0[i] - alpha*(psi_0[i+1] - psi_0[i-1])
 
-    zeta_prev[0] = zeta_0[0] - alpha*(psi_0[1] - psi_0[N_x -2])
-    zeta_prev[N_x-1] = zeta_prev[0]    
+    zeta_prev[0] = zeta_0[0] - alpha*(psi_0[1] - psi_0[-1])
+    zeta_prev[-1] = zeta_prev[0]    
     
     for i in range(0, N_x-1):
-        rhs_poisson[i-1] = -dx**2*zeta_prev[i]
+        rhs_poisson[i] = -dx2*zeta_prev[i]        
 
     psi_prev = np.linalg.solve(A, rhs_poisson)
-    psi_prev[N_x-2] = psi_prev[0]
+
+    psi_prev[-1] = psi_prev[0]
     
     
     outstuff = np.zeros((N_x-1, int(float(T)/dt)+1))
@@ -128,15 +132,16 @@ def leapfrog(N_x, dx, T, dt):
         for i in range(1, N_x-2):
             zeta_curr[i] = zeta_pp[i] - gamma*(psi_prev[i+1] - psi_prev[i-1])
         
-        zeta_curr[0] = zeta_pp[0] - gamma*(psi_prev[1] - psi_prev[N_x -2])
-        zeta_curr[N_x-1] = zeta_curr[0]
+        zeta_curr[0] = zeta_pp[0] - gamma*(psi_prev[1] - psi_prev[-2])
+        zeta_curr[-1] = zeta_curr[0]
         
-        for i in range(1, N_x-1):
-            rhs_poisson[i] = -dx**2*zeta_curr[i]
-        
+        for i in range(0, N_x-1):
+            rhs_poisson[i] = -dx2*zeta_curr[i]
+
+
         psi_curr = np.linalg.solve(A, rhs_poisson)
-        
-        psi_curr[N_x-2] = psi_curr[0]
+
+        psi_curr[-1] = psi_curr[0]
         
         
         for i in range(0, N_x-1):
@@ -173,7 +178,7 @@ def initialize(N, dx):
         
 if __name__ == "__main__":
 
-    T = 150
+    T = 50
     dt = 0.5
     
     dx = 1.0/40
@@ -192,7 +197,8 @@ if __name__ == "__main__":
     
     plt.figure()
     plt.plot(x, outstuff[:,0], 'r-')
-    plt.plot(x, outstuff2[:,0], 'b-.')
+#    plt.plot(x, outstuff2[:,0], 'b-.')
+    plt.grid()
 
     
 #    plt.figure()
