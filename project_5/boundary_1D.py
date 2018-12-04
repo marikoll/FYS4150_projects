@@ -174,7 +174,7 @@ if __name__ == "__main__":
     plt.plot(x, outstuff[:,0], 'r-')
     plt.plot(x, outstuff2[:,0], 'b-.')
 
-    
+    plt.show()
 #    plt.figure()
 #    plt.plot(x, psiE_gauss[1:N-3], 'r-')
 #    plt.plot(x, psiLF_gauss[1:N-3], 'b-.')
