@@ -13,6 +13,7 @@ def assertion(init_psi, init_zeta,N_x):
     epsilon = 1e-10
     bc_0 = 0.0
     bc_N = 0.0
+ 
     if abs(init_psi[0] - bc_0) > epsilon and abs(init_psi[N_x] - bc_N) > epsilon:
         print('psi_0: ', init_psi[0], 'psi_N:', init_psi[N_x])
         print('Error, initial condition does not satisfy BC')
@@ -148,6 +149,8 @@ if __name__ == "__main__":
     
     init_psi = np.zeros(N)
     init_zeta = np.zeros(N)
+    init_psi2 = np.zeros(N)
+    init_zeta2 = np.zeros(N)
     
     init_psi_gauss = np.zeros(N)
     init_zeta_gauss = np.zeros(N)  
@@ -155,15 +158,21 @@ if __name__ == "__main__":
     
     for i in range(0, N-1):
         x = i*dx
-        init_psi[i] = np.sin(4.0*np.pi*x)
+        init_psi[i] = np.sin(4.0*np.pi*x) 
         init_zeta[i] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
+        init_psi2[i] = np.sin(4.0*np.pi*x)
+        print(init_psi2[i], init_psi[i])          
+        init_zeta2[i] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
         
 #        init_psi_gauss[i] = np.exp(-((x-0.5)/sigma)**2)
 #        init_zeta_gauss[i] = (4*((x-0.5)/sigma)**2) - (2/sigma**2)*(np.exp(-((x-0.5)/sigma)**2))
 #    
 
-    outstuff= euler(init_psi, init_zeta, N, dx, T, dt)
     outstuff2 = leapfrog(init_psi, init_zeta, N, dx, T, dt)
+ 
+    outstuff= euler(init_psi2, init_zeta2, N, dx, T, dt)
+
+    
     
 #    psiE_gauss = euler(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
 #    psiLF_gauss = leapfrog(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
