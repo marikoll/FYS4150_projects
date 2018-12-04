@@ -32,20 +32,23 @@ def tridiag(b, y, N, soltn):
     
     #forward substitution
     for i in range(1, N):
-         b[i] = (i + 2)/(i + 1)
-         y[i] = y[i] + (y[i-1]/b[i-1])
+         b[i] = float(i + 2)/float(i + 1)
+         y[i] = y[i] + (float(y[i-1])/float(b[i-1]))
          
     #backward substitution
-    soltn[N-1] = y[N-1]/b[N-1]
+    soltn[N-1] = float(y[N-1])/float(b[N-1])
     
     for i in range(N-2, 0, -1):
-        soltn[i] = (y[i] + soltn[i+1])/b[i]
+        soltn[i] = float(y[i] + soltn[i+1])/float(b[i])
     
     return soltn
 
-def euler(init_psi, init_zeta, N_x, dx, T, dt):
-    psi_0, zeta_0,  bc_0, bc_N = assertion(init_psi, init_zeta, N_x)
+def euler(N_x, dx, T, dt):
+#    psi_0, zeta_0,  bc_0, bc_N = assertion(init_psi, init_zeta, N_x)
+    psi_0, zeta_0 = initialize(N_x, dx)
     alpha = dt/(2*dx)
+    bc_0 = 0.0
+    bc_N = 0.0
     
     psi_prev = np.zeros(N_x)
     psi_curr = np.zeros(N_x)
@@ -86,9 +89,11 @@ def euler(init_psi, init_zeta, N_x, dx, T, dt):
     return outstuff   
 
 
-def leapfrog(init_psi, init_zeta, N_x, dx, T, dt):
-    psi_0, zeta_0,  bc_0, bc_N = assertion(init_psi, init_zeta, N_x)
-    alpha = dt/(2.0*dx)
+def leapfrog(N_x, dx, T, dt):
+    psi_0, zeta_0 = initialize(N_x, dx)
+    alpha = dt/(2*dx)
+    bc_0 = 0.0
+    bc_N = 0.0
     gamma = dt/dx
 
     psi_prev = np.zeros(N_x)
@@ -100,9 +105,10 @@ def leapfrog(init_psi, init_zeta, N_x, dx, T, dt):
     diag = np.zeros(N_x-2)
     rhs_diag = np.zeros(N_x-2)
     
+
     psi_prev  = psi_0
     zeta_prev = zeta_0
-    
+
     
     psi_curr[0] = bc_0; psi_curr[N_x-1] = bc_N 
     zeta_curr[0] = zeta_pp[0]; zeta_curr[N_x-1] = zeta_pp[N_x-1]
@@ -139,6 +145,28 @@ def leapfrog(init_psi, init_zeta, N_x, dx, T, dt):
 
     return outstuff   
 
+def initialize(N, dx):
+    init_psi = np.zeros(N)
+    init_zeta = np.zeros(N)
+#    init_psi2 = np.zeros(N)
+#    init_zeta2 = np.zeros(N)
+    
+#    init_psi_gauss = np.zeros(N)
+#    init_zeta_gauss = np.zeros(N)  
+#    sigma = 0.1
+    
+    for i in range(0, N-1):
+        x = i*dx
+        init_psi[i] = np.sin(4.0*np.pi*x) 
+        init_zeta[i] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
+#        init_psi2[i] = np.sin(4.0*np.pi*x)
+##        print(init_psi2[i], init_psi[i])          
+#        init_zeta2[i] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
+        
+#        init_psi_gauss[i] = np.exp(-((x-0.5)/sigma)**2)
+#        init_zeta_gauss[i] = (4*((x-0.5)/sigma)**2) - (2/sigma**2)*(np.exp(-((x-0.5)/sigma)**2))
+#   
+    return init_psi, init_zeta
 
 if __name__ == "__main__":
     N = 40
@@ -147,30 +175,11 @@ if __name__ == "__main__":
     dx = 1.0/40
     dt = 0.2
     
-    init_psi = np.zeros(N)
-    init_zeta = np.zeros(N)
-    init_psi2 = np.zeros(N)
-    init_zeta2 = np.zeros(N)
-    
-    init_psi_gauss = np.zeros(N)
-    init_zeta_gauss = np.zeros(N)  
-    sigma = 0.1
-    
-    for i in range(0, N-1):
-        x = i*dx
-        init_psi[i] = np.sin(4.0*np.pi*x) 
-        init_zeta[i] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
-        init_psi2[i] = np.sin(4.0*np.pi*x)
-        print(init_psi2[i], init_psi[i])          
-        init_zeta2[i] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
-        
-#        init_psi_gauss[i] = np.exp(-((x-0.5)/sigma)**2)
-#        init_zeta_gauss[i] = (4*((x-0.5)/sigma)**2) - (2/sigma**2)*(np.exp(-((x-0.5)/sigma)**2))
-#    
-
-    outstuff2 = leapfrog(init_psi, init_zeta, N, dx, T, dt)
  
-    outstuff= euler(init_psi2, init_zeta2, N, dx, T, dt)
+
+    outstuff2 = leapfrog(N, dx, T, dt)
+
+    outstuff= euler(N, dx, T, dt)
 
     
     

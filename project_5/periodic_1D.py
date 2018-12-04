@@ -38,8 +38,8 @@ def periodic_matrix(n_rows, n_cols):
     return A
 
 
-def euler(init_psi, init_zeta, N_x, dx, T, dt):
-    psi_0, zeta_0= assertion(init_psi, init_zeta, N_x)
+def euler(N_x, dx, T, dt):
+    psi_0, zeta_0 = initialize(N_x, dx)
     alpha = dt/(2*dx)
     
     psi_prev = np.zeros(N_x)
@@ -87,9 +87,8 @@ def euler(init_psi, init_zeta, N_x, dx, T, dt):
 
     return outstuff   
         
-def leapfrog(init_psi, init_zeta, N_x, dx, T, dt):
-    psi_0, zeta_0 = assertion(init_psi, init_zeta, N_x)
-
+def leapfrog(N_x, dx, T, dt):
+    psi_0, zeta_0 = initialize(N_x, dx)
     alpha = dt/(2*dx)
     gamma =  dt/dx
     
@@ -152,7 +151,25 @@ def leapfrog(init_psi, init_zeta, N_x, dx, T, dt):
         n += 1
 
     return outstuff   
+
+def initialize(N, dx):
+    init_psi = np.zeros(N)
+    init_zeta = np.zeros(N)
+    
+    
+#    init_psi_gauss = np.zeros(N)
+#    init_zeta_gauss = np.zeros(N)  
+#    sigma = 0.1
+    
+    for i in range(0, N-1):
+        x = i*dx
+        init_psi[i] = np.sin(4.0*np.pi*x)
+        init_zeta[i] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
         
+#        init_psi_gauss[i] = np.exp(-((x-0.5)/sigma)**2)
+#        init_zeta_gauss[i] = (4*((x-0.5)/sigma)**2) - (2/sigma**2)*(np.exp(-((x-0.5)/sigma)**2))
+#    
+    return init_psi, init_zeta
         
 if __name__ == "__main__":
 
@@ -163,24 +180,10 @@ if __name__ == "__main__":
     L = 1.0
     N = int(L/dx + 1)
     
-    init_psi = np.zeros(N)
-    init_zeta = np.zeros(N)
-    
-    init_psi_gauss = np.zeros(N)
-    init_zeta_gauss = np.zeros(N)  
-    sigma = 0.1
-    
-    for i in range(0, N-1):
-        x = i*dx
-        init_psi[i] = np.sin(4.0*np.pi*x)
-        init_zeta[i] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
-        
-#        init_psi_gauss[i] = np.exp(-((x-0.5)/sigma)**2)
-#        init_zeta_gauss[i] = (4*((x-0.5)/sigma)**2) - (2/sigma**2)*(np.exp(-((x-0.5)/sigma)**2))
-#    
 
-    outstuff= euler(init_psi, init_zeta, N, dx, T, dt)
-    outstuff2 = leapfrog(init_psi, init_zeta, N, dx, T, dt)
+
+    outstuff= euler(N, dx, T, dt)
+    outstuff2 = leapfrog(N, dx, T, dt)
     
 #    psiE_gauss = euler(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
 #    psiLF_gauss = leapfrog(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
