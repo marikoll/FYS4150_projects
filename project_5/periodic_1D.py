@@ -19,10 +19,9 @@ def assertion(init_psi, init_zeta,N_x):
     psi_0 = np.empty(len(init_psi))
     zeta_0 = np.empty(len(init_zeta))
     
-    
-    for i in range(0,N_x):
-        psi_0[i] = init_psi[i]
-        zeta_0[i] = init_zeta[i]
+
+    psi_0 = init_psi
+    zeta_0 = init_zeta
     return psi_0, zeta_0
 
 def periodic_matrix(n_rows, n_cols):
@@ -52,9 +51,9 @@ def euler(init_psi, init_zeta, N_x, dx, T, dt):
     rhs_poisson = np.zeros(N_x-1)
     A = periodic_matrix(int(N_x-1),int(N_x-1))
     
-    for i in range(0,N_x):
-        psi_prev[i]  = psi_0[i]
-        zeta_prev[i] = zeta_0[i]
+    
+    psi_prev  = psi_0
+    zeta_prev = zeta_0
     
     outstuff = np.zeros((N_x-1, int(float(T)/dt)+1))
     t = 0.0
@@ -73,7 +72,7 @@ def euler(init_psi, init_zeta, N_x, dx, T, dt):
 
 
         psi_curr = np.linalg.solve(A, rhs_poisson)
-
+        
         psi_curr[N_x-2] = psi_curr[0]
         
         for i in range(0, N_x-1):
@@ -104,9 +103,8 @@ def leapfrog(init_psi, init_zeta, N_x, dx, T, dt):
     rhs_poisson = np.zeros(N_x-1)
     A = periodic_matrix(int(N_x-1),int(N_x-1))
     
-    for i in range(0,N_x):
-        psi_prev[i]  = psi_0[i]
-        zeta_prev[i] = zeta_0[i]
+    psi_prev  = psi_0
+    zeta_prev = zeta_0
     
     #initial Euler:
     for i in range(1, N_x-1):
@@ -124,13 +122,13 @@ def leapfrog(init_psi, init_zeta, N_x, dx, T, dt):
     
     outstuff = np.zeros((N_x-1, int(float(T)/dt)+1))
     t = 0.0
-    n = 2
-     
+    n = 0
+    
     while t < T:
         #forward Euler:
         for i in range(1, N_x-2):
             zeta_curr[i] = zeta_pp[i] - gamma*(psi_prev[i+1] - psi_prev[i-1])
-        print(psi_prev.size, zeta_pp.size, gamma)
+        
         zeta_curr[0] = zeta_pp[0] - gamma*(psi_prev[1] - psi_prev[N_x -2])
         zeta_curr[N_x-1] = zeta_curr[0]
         
@@ -138,7 +136,9 @@ def leapfrog(init_psi, init_zeta, N_x, dx, T, dt):
             rhs_poisson[i] = -dx**2*zeta_curr[i]
         
         psi_curr = np.linalg.solve(A, rhs_poisson)
+        
         psi_curr[N_x-2] = psi_curr[0]
+        
         
         for i in range(0, N_x-1):
             psi_prev[i] = psi_curr[i]
@@ -148,19 +148,15 @@ def leapfrog(init_psi, init_zeta, N_x, dx, T, dt):
         t += dt
         if (n % 20 == 0):
             outstuff[:, n] = psi_curr[:]
-            print(psi_curr[1:10]) 
-
-            
-            
 
         n += 1
 
-    return psi_curr, outstuff   
+    return outstuff   
         
         
 if __name__ == "__main__":
 
-    T = 50
+    T = 150
     dt = 0.5
     
     dx = 1.0/40
@@ -189,11 +185,11 @@ if __name__ == "__main__":
 #    psiE_gauss = euler(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
 #    psiLF_gauss = leapfrog(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
     
-#    x = np.linspace(0, 1, N-1)
-#    
-#    plt.figure()
-#    plt.plot(x, outstuff[:,0], 'r-')
-#    plt.plot(x, outstuff2[:,0], 'b-.')
+    x = np.linspace(0, 1, N-1)
+    
+    plt.figure()
+    plt.plot(x, outstuff[:,0], 'r-')
+    plt.plot(x, outstuff2[:,0], 'b-.')
 
     
 #    plt.figure()
