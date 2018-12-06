@@ -8,6 +8,7 @@ Created on Mon Dec  3 15:22:26 2018
 
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.interpolate as inter
 
 
 
@@ -25,14 +26,22 @@ def periodic_matrix(n_rows, n_cols):
     return A
 
 
-def initialize(N, dx):
+def initialize(N, dx, case):
     init_psi = np.zeros(N)
     init_zeta = np.zeros(N)
-
-    for i in range(0, N-1):
-        x = i*dx
-        init_psi[i] = np.sin(4.0*np.pi*x)
-        init_zeta[i] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
+    if case == 'sine':
+        for i in range(0, N-1):
+            x = i*dx
+            init_psi[i] = np.sin(4.0*np.pi*x)
+            init_zeta[i] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
+    if case == 'gauss':
+        for i in range(0, N-1):
+            x = i*dx
+            sigma = 0.1
+            init_psi[i] = np.exp(-((x-0.5)/sigma)**2)
+            init_zeta[i] = 4.0*((x-0.5)/sigma**2)**2 - (2/sigma**2)*np.exp(-((x-0.5)/sigma)**2)
+        
+    
 
     return init_psi, init_zeta
 
@@ -86,8 +95,8 @@ def euler_fwd(N_x, dx, T, dt):
 
     return outstuff   
         
-def center(N_x, dx, T, dt):
-    psi_0, zeta_0 = initialize(N_x, dx)
+def center(N_x, dx, T, dt, case):
+    psi_0, zeta_0 = initialize(N_x, dx, case)
     alpha = dt/(2*dx)
     gamma =  dt/dx
     dx2 = dx**2
@@ -160,8 +169,8 @@ def center(N_x, dx, T, dt):
         
 if __name__ == "__main__":
 
-    T = 150
-    dt = 0.5
+    T = 200
+    dt = 0.01
     
     dx = 1.0/40
     L = 1.0
@@ -169,23 +178,108 @@ if __name__ == "__main__":
     
 
 
-    outstuff= euler_fwd(N, dx, T, dt)
-    outstuff2 = center(N, dx, T, dt)
+    psi_center_sine = center(N, dx, T, dt, case = 'sine')
+    psi_center_gauss = center(N, dx, T, dt, case = 'gauss')
     
-#    psiE_gauss = euler(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
-#    psiLF_gauss = leapfrog(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
+    psi_center_sine = np.matrix(psi_center_sine)
     
-    x = np.linspace(0, 1, N-1)
+    x = np.linspace(0,L,N-1)
+    t = np.linspace(0,T,int(T/dt)+1)
+
     
-    plt.figure()
-    plt.plot(x, outstuff[:, 0], 'r-')
-    plt.plot(x, outstuff2[:,0], 'b-.')
-    plt.grid()
+    T, X = np.meshgrid(t, x,sparse=False)
+
+    plt.figure(1)
+    plt.contourf([X,T,], psi_center_sine)
+    plt.show()
+    
+    plt.figure(2)
+    plt.contourf([X,T,], psi_center_gauss)
+    plt.show()    
+    
+    
+    
+    
+
+#    psi_euler= euler_fwd(N, dx, T, dt)
+#
+#    dt2 = 0.01
+#    
+#    psi_center2 = center(N, dx, T, dt2)
+#    
+#    psi_euler2 = euler_fwd(N, dx, T, dt2)
+#    
+#    dt3 = 0.2
+#    
+#    psi_center3 = center(N, dx, T, dt3)
+#    
+#    psi_euler3 = euler_fwd(N, dx, T, dt3)
+#    
+#    dt4 = 1.0
+#    
+#    psi_center4 = center(N, dx, T, dt4)
+#    
+#    psi_euler4 = euler_fwd(N, dx, T, dt4)
+#    
+#    x = np.linspace(0, 1, N-1)
+#
+#    
+#    plt.figure()
+#    plt.plot(x, outstuff[:, 0], 'r-', label = 'Euler')
+#    plt.plot(x, outstuff2[:,0], 'b-.', label = 'Centered')
+#    plt.legend()
+#    plt.title(r'Streamfunction $\psi(x, t)$ at $t = {}$ with $\Delta t = {:.3f}$'\
+#          .format(T, dt), fontsize = 15)
+#    plt.xlabel('x', fontsize = 12)
+#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+#    plt.grid()
 
     
 #    plt.figure()
 #    plt.plot(x, psiE_gauss[1:N-3], 'r-')
-#    plt.plot(x, psiLF_gauss[1:N-3], 'b-.')       
+#    plt.plot(x, psiLF_gauss[1:N-3], 'b-.')    
+#
+#    plt.figure(2, figsize = (10, 8))
+#    plt.subplot(221)
+#    plt.plot(x, psi_euler[:,0], 'r-', label = 'Euler')
+#    plt.plot(x, psi_center[:,0], 'b-.', label = 'Centered')
+#    plt.legend()
+#    plt.title(r'$\Delta t = {:.3f}$'\
+#              .format(dt), fontsize = 15)
+##    plt.xlabel('x', fontsize = 12)
+#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+#    plt.grid()
+#    plt.subplot(222)
+#    plt.plot(x, psi_euler2[:,0], 'r-', label = 'Euler')
+#    plt.plot(x, psi_center2[:,0], 'b-.', label = 'Centered')
+#    plt.legend()
+#    plt.title(r'$\Delta t = {:.3f}$'\
+#              .format(dt2), fontsize = 15)
+##    plt.xlabel('x', fontsize = 12)
+##    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+#    plt.grid()
+#    plt.subplot(223)
+#    plt.plot(x, psi_euler3[:,0], 'r-', label = 'Euler')
+#    plt.plot(x, psi_center3[:,0], 'b-.', label = 'Centered')
+#    plt.legend()
+#    plt.title(r'$\Delta t = {:.2f}$'\
+#              .format(dt3), fontsize = 15)
+#    plt.xlabel('x', fontsize = 12)
+#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+#    plt.grid()
+#    plt.subplot(224)
+#    plt.plot(x, psi_euler4[:,0], 'r-', label = 'Euler')
+#    plt.plot(x, psi_center4[:,0], 'b-.', label = 'Centered')
+#    plt.legend()
+#    plt.title(r'$\Delta t = {:.1f}$'\
+#              .format(dt4), fontsize = 15)
+#    plt.xlabel('x', fontsize = 12)
+##    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+#    plt.grid()
+#    plt.savefig('figs/subplots_periodic1D.pdf')
+
+
+   
         
         
         
