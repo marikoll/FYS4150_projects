@@ -4,27 +4,6 @@ import matplotlib.pyplot as plt
 from poisson_solver import poisson_jacobi_periodic
 
 
-def assertion(init_psi, init_zeta,N_x, N_y):
-    epsilon = 1e-10
-    for j in range(0, N_y):
-
-        if abs(init_psi[0 + j] - init_psi[(N_x -1)*N_y + j]) > epsilon:
-            print('psi_0: ', init_psi[0], 'psi_N:', init_psi[N_x-1])
-            print('Error, initial condition does not satisfy BC')
-    for i in range(0, N_x):
-        if abs(init_psi[i*N_y + 0] - init_psi[(i*N_y)+(N_y -i)]) > epsilon:
-            print('psi_0: ', init_psi[0], 'psi_N:', init_psi[N_x-1])
-            print('Error, initial condition does not satisfy BC')
-
-
-    psi_0 = np.empty(len(init_psi))
-    zeta_0 = np.empty(len(init_zeta))
-
-
-    psi_0 = init_psi
-    zeta_0 = init_zeta
-    return psi_0, zeta_0
-
 def periodic_matrix(n_rows, n_cols):
     A = np.zeros((n_rows, n_cols))
     for i in range(0,n_rows):
@@ -38,12 +17,26 @@ def periodic_matrix(n_rows, n_cols):
 
     return A
 
+def initialize(N_x, N_y, dx, dy):
+    init_psi = np.zeros(N_x*N_y)
+    init_zeta = np.zeros(N_x*N_y)
+
+    for i in range(0, N_x):
+        for j in range(0, N_y):
+            x = i*dx
+            init_psi[i*N_y + j] = np.sin(4.0*np.pi*x) 
+            init_zeta[i*N_y + j] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
+
+    return init_psi, init_zeta
+
 
 def leapfrog(init_psi, init_zeta, N_x,N_y, dx,dy, T, dt):
-    psi_0, zeta_0 = assertion(init_psi, init_zeta, N_x, N_y)
+    psi_0, zeta_0 = initialize(N_x, N_y, dx, dy)
 
     alpha = dt/(2*dx)
     gamma =  dt/dx
+    dx2 = dx**2
+
 
     multi = N_x*N_y
     psi_prev = np.zeros(multi)
@@ -51,42 +44,56 @@ def leapfrog(init_psi, init_zeta, N_x,N_y, dx,dy, T, dt):
     zeta_prev = np.zeros(multi)
     zeta_pp = np.zeros(multi)
     zeta_curr = np.zeros(multi)
+    
+    rhs_poisson = np.zeros(multi-1)
+    A = periodic_matrix(multi-1, multi-1)
 
     for i in range(0,N_x):
         for j in range(0,N_y):
-
             psi_prev[i*N_y + j] = psi_0[i*N_y +j]
             zeta_prev[i*N_y + j] = zeta_0[i*N_y +j]
 
     #initial Euler:
     for i in range(1, N_x-1):
         for j in range(0, N_y):
-            zeta_prev[i*N_y +j] = zeta_0[i*N_y + j] - alpha*(psi_0[(i+1)*N_y + j] - psi_0[(i-1)*N_y + j])
+            zeta_prev[i*N_y +j] = zeta_0[i*N_y + j] - \
+            alpha*(psi_0[(i+1)*N_y + j] - psi_0[(i-1)*N_y + j])
     for j in range(0, N_y):
-        zeta_prev[0*N_y + j] = zeta_0[0*N_y + j] - alpha*(psi_0[1*N_y + j] - psi_0[(N_x -2)*N_y + j])
+        zeta_prev[0*N_y + j] = zeta_0[0*N_y + j] - alpha*(psi_0[1*N_y + j] \
+                 - psi_0[(N_x -2)*N_y + j])
         zeta_prev[(N_x-1)*N_y + j] = zeta_prev[0*N_y + j]
 
+    for i in range(0, N_x-1):
+        rhs_poisson[i] = -dx2*zeta_prev[i]
 
-    poisson_jacobi_periodic(zeta_prev, dx, dy, N_x, N_y, 50, psi_prev)
+    psi_prev = np.linalg.solve(A, rhs_poisson)
 
-    outstuff = np.zeros((N_x-1, int(float(T)/dt)+1))
+    data_out = np.zeros((N_x*N_y-1, int(float(T)/dt)+1))
     t = 0.0
-    n = 2
+    data_out[0,0] = t
+    data_out[1:, 0] = psi_0[:-1]
+    n = 0
+    n2 = 1
 
     while t < T:
         #forward Euler:
-        for i in range(1, N_x-1):
-            for j in range(0,N_y):
-                zeta_curr[i*N_y + j] = zeta_pp[i*N_y + j] - gamma*(psi_prev[(i+1)*N_y + j] - psi_prev[(i-1)*N_y + j])
+        for i in range(1, N_x-2):
+            for j in range(0,N_y-1):
+                zeta_curr[i*N_y + j] = zeta_pp[i*N_y + j] \
+                - gamma*(psi_prev[(i+1)*N_y + j] - psi_prev[(i-1)*N_y + j])
         for j in range(0, N_y):
-            zeta_curr[0*N_y + j] = zeta_pp[0*N_y + j] - gamma*(psi_prev[1*N_y + j] - psi_prev[(N_x -2)*N_y + j])
+            zeta_curr[0*N_y + j] = zeta_pp[0*N_y + j] - \
+            gamma*(psi_prev[1*N_y + j] - psi_prev[(N_x -2)*N_y + j])
             zeta_curr[(N_x-1)*N_y + j] = zeta_curr[0*N_y + j]
 
+        for i in range(0, N_x-1):
+            rhs_poisson[i] = -dx2*zeta_curr[i]
 
-        poisson_jacobi_periodic(zeta_curr, dx, dt, N_x. N_y, 50, psi_curr)
+        psi_curr = np.linalg.solve(A, rhs_poisson)
+        #poisson_jacobi_periodic(zeta_curr, dx, dt, N_x. N_y, 50, psi_curr)
 
-        for i in range(0, N_x):
-            for j in range(0, N_y):
+        for i in range(0, N_x-1):
+            for j in range(0, N_y-1):
 
                 psi_prev[i*N_y + j] = psi_curr[i*N_y + j]
                 zeta_pp[i*N_y + j] = zeta_prev[i*N_y + j]
@@ -94,11 +101,14 @@ def leapfrog(init_psi, init_zeta, N_x,N_y, dx,dy, T, dt):
 
         t += dt
         if (n % 50 == 0):
-            outstuff[:, n] = psi_curr[:]
+            data_out[0, n2] = t
+            data_out[1:, n2] = psi_curr[:]
+            
+            n2 += 1
 
         n += 1
 
-    return outstuff
+    return data_out
 
 
 if __name__ == "__main__":
@@ -112,27 +122,9 @@ if __name__ == "__main__":
     N_x = int(L/dx + 1)
     N_y = int(L/dy +1)
 
-    init_psi = np.zeros(N_x*N_y)
-    init_zeta = np.zeros(N_x*N_y)
 
-    init_psi_gauss = np.zeros(N_x*N_y)
-    init_zeta_gauss = np.zeros(N_x*N_y)
-    sigma = 0.1
+    outstuff2 = leapfrog(N_x, N_y, dx,dy, T, dt)
 
-    for i in range(0, N_x):
-        for j in range(0, N_y):
-            x = i*dx
-            y = j*dy
-            init_psi[i*N_y + j] = np.sin(4.0*np.pi*x)
-            init_zeta[i*N_y + j] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
-
-#        init_psi_gauss[i] = np.exp(-((x-0.5)/sigma)**2)
-#        init_zeta_gauss[i] = (4*((x-0.5)/sigma)**2) - (2/sigma**2)*(np.exp(-((x-0.5)/sigma)**2))
-#
-
-    #outstuff= euler(init_psi, init_zeta, N, dx, T, dt)
-    outstuff2 = leapfrog(init_psi, init_zeta, N_x, N_y, dx,dy, T, dt)
-    print(outstuff2)
 #    psiE_gauss = euler(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
 #    psiLF_gauss = leapfrog(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
 
