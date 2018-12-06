@@ -30,7 +30,7 @@ def initialize(N_x, N_y, dx, dy):
     return init_psi, init_zeta
 
 
-def leapfrog(init_psi, init_zeta, N_x,N_y, dx,dy, T, dt):
+def leapfrog(N_x,N_y, dx,dy, T, dt):
     psi_0, zeta_0 = initialize(N_x, N_y, dx, dy)
 
     alpha = dt/(2*dx)
