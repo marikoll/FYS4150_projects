@@ -72,12 +72,12 @@ def euler_fwd(N_x, dx, T, dt):
 
     while t < T:
         # forward Euler:
-        for i in range(1, N_x-1):
+        for i in range(1, N_x-2):
             zeta_curr[i] = zeta_prev[i] - alpha*(psi_prev[i+1] - psi_prev[i-1])
-        for i in range(1, N_x-1):
+        for i in range(1, N_x-2):
             rhs_diag[i-1] = -dx2*zeta_curr[i]
         psi_curr = tridiag(diag, rhs_diag, N_x -2, psi_curr)
-        for i in range(1, N_x-1):
+        for i in range(1, N_x-2):
             psi_prev[i] = psi_curr[i]
             zeta_prev[i] = zeta_curr[i]
         
@@ -117,9 +117,9 @@ def center(N_x, dx, T, dt):
 
 
     #initial Euler:
-    for i in range(1, N_x-1):
+    for i in range(1, N_x-2):
         zeta_prev[i] = zeta_0[i] - alpha*(psi_0[i+1] - psi_0[i-1])
-#    for i in range(1, N_x-1):
+#    for i in range(1, N_x-2):
 #        rhs_diag[i-1] = -dx2*zeta_prev[i]
 #
 #   
@@ -130,13 +130,13 @@ def center(N_x, dx, T, dt):
     n = 0
 
     while t < T:
-        for i in range(1, N_x-1):
+        for i in range(1, N_x-2):
             zeta_curr[i] = zeta_pp[i] - gamma*(psi_prev[i+1] - psi_prev[i-1])
-        for i in range(1,N_x-1):
+        for i in range(1,N_x-2):
             rhs_diag[i-1] = -dx2*zeta_curr[i]
         psi_curr = tridiag(diag, rhs_diag, N_x -2, psi_curr)
     
-        for i in range(1, N_x -1):
+        for i in range(1, N_x -2):
             psi_prev[i] = psi_curr[i]
             zeta_pp[i] = zeta_prev[i]
             zeta_prev[i] = zeta_curr[i]
@@ -233,7 +233,7 @@ if __name__ == "__main__":
     plt.xlabel('x', fontsize = 12)
 #    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
     plt.grid()
-    plt.savefig('figs/subplots_boundary1D.pdf')
+#    plt.savefig('figs/subplots_boundary1D.pdf')
 
 
 
