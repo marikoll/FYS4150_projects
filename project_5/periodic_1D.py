@@ -173,7 +173,7 @@ def center(N_x, dx, T, dt, case):
         
 if __name__ == "__main__":
 
-    T = 50
+    T = 200
     dt = 0.25
     
     dx = 1.0/40
@@ -181,10 +181,10 @@ if __name__ == "__main__":
     N = int(L/dx + 1)
     
 
-#
-#    psi_center_sine = center(N, dx, T, dt, case = 'sine')
-#    psi_center_gauss = center(N, dx, T, dt, case = 'gauss')
-#    
+
+    psi_center_sine = center(N, dx, T, dt, case = 'sine')
+    psi_center_gauss = center(N, dx, T, dt, case = 'gauss')
+    
 #    psi_center_sine = psi_center_sine[:,0::20]
 #    psi_center_gauss = psi_center_gauss[:,0::20]
 #    
@@ -231,17 +231,17 @@ if __name__ == "__main__":
 #    x = np.linspace(0, 1, N-1)
 #
 #   
-    outstuff = euler_fwd(N, dx, T, dt, case = 'sine')
-    outstuff2 = center(N, dx, T, dt, case = 'sine')
-    plt.figure()
-    plt.plot(outstuff, 'r-', label = 'Euler')
-    plt.plot(outstuff2[1:,1], 'b-.', label = 'Centered')
-    plt.legend()
-    plt.title(r'Streamfunction $\psi(x, t)$ at $t = {}$ with $\Delta t = {:.3f}$'\
-          .format(T, dt), fontsize = 15)
-    plt.xlabel('x', fontsize = 12)
-    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-    plt.grid()
+#    outstuff = euler_fwd(N, dx, T, dt, case = 'sine')
+#    outstuff2 = center(N, dx, T, dt, case = 'sine')
+#    plt.figure()
+#    plt.plot(outstuff, 'r-', label = 'Euler')
+#    plt.plot(outstuff2[1:,1], 'b-.', label = 'Centered')
+#    plt.legend()
+#    plt.title(r'Streamfunction $\psi(x, t)$ at $t = {}$ with $\Delta t = {:.3f}$'\
+#          .format(T, dt), fontsize = 15)
+#    plt.xlabel('x', fontsize = 12)
+#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+#    plt.grid()
 
     
 #    plt.figure()
