@@ -87,10 +87,10 @@ def center(N_x, N_y, dy, dx, T, dt):
 #
 #    psi_prev = tridiag(diag, rhs_diag, N_x-2, psi_prev)
 #    print(psi_prev[1:10])
-    data_out = np.zeros((N_x*N_y, int(float(T)/dt)+1))
+    data_out = np.zeros((int(N_x*N_y+1), int(float(T)/dt)+1))
     t = 0.0
     data_out[0,0] = t
-    data_out[1:, 0] = psi_0[:-1]
+    data_out[1:, 0] = psi_0[:]
     n = 0
     n2 = 1
 
@@ -120,7 +120,7 @@ def center(N_x, N_y, dy, dx, T, dt):
 
 
 if __name__ == "__main__":
-    T = 200
+    T = 100
     dt = 0.01
 
     dx = 1.0/40
