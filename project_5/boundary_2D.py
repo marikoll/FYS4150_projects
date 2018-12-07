@@ -58,8 +58,8 @@ def center(N_x, N_y, dy, dx, T, dt):
 
     for i in range(0, N_x):
         for j in range(0, N_y):
-            psi_prev[i*N_y, +j] = psi_0[i*N_y, +j]
-            zeta_pp[i*N_y, +j] = zeta_0[i*N_y, +j]
+            psi_prev[i*N_y +j] = psi_0[i*N_y +j]
+            zeta_pp[i*N_y +j] = zeta_0[i*N_y +j]
             
             psi_curr[0 + j] = bc_0y[j]
             psi_curr[(N_x-1)*N_y + j] = bc_Ny[j]
