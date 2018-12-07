@@ -60,11 +60,6 @@ def center(N_x, N_y, dy, dx, T, dt, case):
     
     bc_0x = np.zeros(N_x)
     bc_Nx = np.zeros(N_x)
-    # Arrays for tridiagonal solver
-#    diag = np.ones(N_x-2)*(-1)
-#    rhs_diag = np.zeros(N_x-2)
-
-    # initial condition and boundary conditions
 
     for i in range(0, N_x):
         for j in range(0, N_y):
@@ -91,12 +86,7 @@ def center(N_x, N_y, dy, dx, T, dt, case):
     psi_prev = poission_jacobi(zeta_prev, bc_0y, bc_Ny, bc_0x, bc_Nx, dx, dy, N_x, \
                                N_y, 50, psi_prev)
     
-#    for i in range(1, N_x-1):
-#        rhs_diag[i-1] = -dx2*zeta_prev[i]
-#
-#
-#    psi_prev = tridiag(diag, rhs_diag, N_x-2, psi_prev)
-#    print(psi_prev[1:10])
+
     data_out = np.zeros((int(N_x*N_y+1), int(float(T)/dt)+1))
     t = 0.0
     data_out[0,0] = t
@@ -140,24 +130,46 @@ if __name__ == "__main__":
     N_y = int(L/dy +1)
     
     
-    data_out = center(N_x, N_y, dy, dx, T, dt, 'sine')
+    data_out_sine = center(N_x, N_y, dy, dx, T, dt, 'sine')
     
 #    t = data_out[0,:]
-    psi = data_out[1:, :200]
-    new_psi = np.zeros((41, 41, 200))
+    psi_sine = data_out_sine[1:, :200]
+    new_psi_sine = np.zeros((41, 41, 200))
     for t in range(0, 200):
-        new_psi[:,:, t] = psi[:, t].reshape(41,41).transpose()
+        new_psi_sine[:,:, t] = psi_sine[:, t].reshape(41,41).transpose()
     
     x = np.linspace(0, 1, 41)
     y = np.linspace(0, 1, 41)
     
     plt.style.use("ggplot")
     fig = plt.figure(figsize = (9,7))
-    CS = plt.contourf(x, y, new_psi[:,:,0], 20, cmap = plt.cm.RdBu_r)
+    CS = plt.contourf(x, y, new_psi_sine[:,:,0], 20, cmap = plt.cm.RdBu_r)
     plt.colorbar(CS, orientation = "vertical")
     plt.title(r'Contour field of $\psi(x, y, 0)$ in bounded domain', fontsize = 15)
     plt.xlabel('x', fontsize = 13)
     plt.ylabel('y', fontsize = 13)
+    plt.savefig('figs/sine_boundary_2d.pdf', bbox_inches = 'tight')
+    
+    
+    data_out_gauss = center(N_x, N_y, dy, dx, T, dt, 'gauss')
+    
+#    t = data_out[0,:]
+    psi_gauss = data_out_gauss[1:, :200]
+    new_psi_gauss = np.zeros((41, 41, 200))
+    for t in range(0, 200):
+        new_psi_gauss[:,:, t] = psi_gauss[:, t].reshape(41,41).transpose()
+    
+    x = np.linspace(0, 1, 41)
+    y = np.linspace(0, 1, 41)
+    
+    plt.style.use("ggplot")
+    fig = plt.figure(figsize = (9,7))
+    CS = plt.contourf(x, y, new_psi_gauss[:,:,0], 20, cmap = plt.cm.RdBu_r)
+    plt.colorbar(CS, orientation = "vertical")
+    plt.title(r'Contour field of $\psi(x, y, 0)$ in bounded domain', fontsize = 15)
+    plt.xlabel('x', fontsize = 13)
+    plt.ylabel('y', fontsize = 13)
+    plt.savefig('figs/gauss_boundary_2d.pdf', bbox_inches = 'tight')
     
     
     
