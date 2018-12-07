@@ -148,13 +148,13 @@ if __name__ == "__main__":
     fig = plt.figure(figsize = (9,7))
     CS = plt.contourf(x, y, new_psi_sine[:,:,0], 20, cmap = plt.cm.RdBu_r)
     plt.colorbar(CS, orientation = "vertical")
-    plt.title(r'Contour field of $\psi(x, y, 0) in the periodic domain$', fontsize = 15)
+    plt.title(r'Contour field of $\psi(x, y, 0)$ in the periodic domain', fontsize = 15)
     plt.xlabel('x', fontsize = 13)
     plt.ylabel('y', fontsize = 13)
     plt.savefig('figs/sine_periodic_2d.pdf', bbox_inches = 'tight')
     
     
-    data_out_gauss = center(N_x, N_y, dy, dx, T, dt)
+    data_out_gauss = center(N_x, N_y, dy, dx, T, dt, 'gauss')
     
 #    t = data_out[0,:]
     psi_gauss = data_out_gauss[1:, :200]
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     fig = plt.figure(figsize = (9,7))
     CS = plt.contourf(x, y, new_psi_gauss[:,:,0], 20, cmap = plt.cm.RdBu_r)
     plt.colorbar(CS, orientation = "vertical")
-    plt.title(r'Contour field of $\psi(x, y, 0) in the periodic domain$', fontsize = 15)
+    plt.title(r'Contour field of $\psi(x, y, 0)$ in the periodic domain', fontsize = 15)
     plt.xlabel('x', fontsize = 13)
     plt.ylabel('y', fontsize = 13)
     plt.savefig('figs/gauss_periodic_2d.pdf', bbox_inches = 'tight')
