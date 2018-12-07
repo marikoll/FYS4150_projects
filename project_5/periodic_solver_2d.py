@@ -151,7 +151,7 @@ if __name__ == "__main__":
     plt.title(r'Contour field of $\psi(x, y, 0) in the periodic domain$', fontsize = 15)
     plt.xlabel('x', fontsize = 13)
     plt.ylabel('y', fontsize = 13)
-    plt.savefig('/figs/sine_periodic_2d.pdf', bbox_inches = 'tight')
+    plt.savefig('figs/sine_periodic_2d.pdf', bbox_inches = 'tight')
     
     
     data_out_gauss = center(N_x, N_y, dy, dx, T, dt)
@@ -172,5 +172,5 @@ if __name__ == "__main__":
     plt.title(r'Contour field of $\psi(x, y, 0) in the periodic domain$', fontsize = 15)
     plt.xlabel('x', fontsize = 13)
     plt.ylabel('y', fontsize = 13)
-    plt.savefig('/figs/gauss_periodic_2d.pdf', bbox_inches = 'tight')
+    plt.savefig('figs/gauss_periodic_2d.pdf', bbox_inches = 'tight')
  
