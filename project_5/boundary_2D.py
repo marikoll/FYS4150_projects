@@ -21,21 +21,31 @@ def tridiag(b, y, N, soltn):
 
     return soltn
 
-def initialize(N_x, N_y, dx, dy):
+def initialize(N_x, N_y, dx, dy, case):
     init_psi = np.zeros(N_x*N_y)
     init_zeta = np.zeros(N_x*N_y)
-
-    for i in range(0, N_x):
-        for j in range(0, N_y):
-            x = i*dx
-            init_psi[i*N_y + j] = np.sin(4.0*np.pi*x) 
-            init_zeta[i*N_y + j] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
-
+    
+    if case == 'sine':
+        for i in range(0, N_x):
+            for j in range(0, N_y):
+                x = i*dx
+                y = i*dy
+                init_psi[i*N_y + j] = np.sin(np.pi*y)*np.sin(4.0*np.pi*x) 
+                init_zeta[i*N_y + j] = -17.0*np.pi**2*np.sin(4.0*np.pi*x)*np.sin(np.pi*y)
+    if case == 'gauss':
+        for i in range(0, N_x):
+            for j in range(0, N_y):
+                x = i*dx
+                y = i*dy
+                sigma = 0.1
+                init_psi[i] = np.exp(-((x-0.5)/sigma)**2)
+                init_zeta[i] = 4.0*((x-0.5)/sigma**2)**2 - (2/sigma**2)*np.exp(-((x-0.5)/sigma)**2)
+    
     return init_psi, init_zeta
 
 
-def center(N_x, N_y, dy, dx, T, dt):
-    psi_0, zeta_0 = initialize(N_x, N_y, dy, dx)
+def center(N_x, N_y, dy, dx, T, dt, case):
+    psi_0, zeta_0 = initialize(N_x, N_y, dy, dx, case)
     alpha = dt/(2*dx)
     gamma = dt/dx
     
@@ -130,8 +140,24 @@ if __name__ == "__main__":
     N_y = int(L/dy +1)
     
     
-    data_out = center(N_x, N_y, dy, dx, T, dt)
+    data_out = center(N_x, N_y, dy, dx, T, dt, 'sine')
     
+#    t = data_out[0,:]
+    psi = data_out[1:, :200]
+    new_psi = np.zeros((41, 41, 200))
+    for t in range(0, 200):
+        new_psi[:,:, t] = psi[:, t].reshape(41,41).transpose()
+    
+    x = np.linspace(0, 1, 41)
+    y = np.linspace(0, 1, 41)
+    
+    plt.style.use("ggplot")
+    fig = plt.figure(figsize = (9,7))
+    CS = plt.contourf(x, y, new_psi[:,:,0], 20, cmap = plt.cm.RdBu_r)
+    plt.colorbar(CS, orientation = "vertical")
+    plt.title(r'Contour field of $\psi(x, y, 0)$ in bounded domain', fontsize = 15)
+    plt.xlabel('x', fontsize = 13)
+    plt.ylabel('y', fontsize = 13)
     
     
     

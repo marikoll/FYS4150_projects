@@ -1,7 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from poisson_solver import poisson_jacobi_periodic
+#from poisson_solver import poisson_jacobi_periodic
 
 
 def periodic_matrix(n_rows, n_cols):
@@ -17,21 +17,32 @@ def periodic_matrix(n_rows, n_cols):
 
     return A
 
-def initialize(N_x, N_y, dx, dy):
+def initialize(N_x, N_y, dx, dy, case):
     init_psi = np.zeros(N_x*N_y)
     init_zeta = np.zeros(N_x*N_y)
-
-    for i in range(0, N_x):
-        for j in range(0, N_y):
-            x = i*dx
-            init_psi[i*N_y + j] = np.sin(4.0*np.pi*x) 
-            init_zeta[i*N_y + j] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
-
+    
+    if case == 'sine':
+        for i in range(0, N_x):
+            for j in range(0, N_y):
+                x = i*dx
+#                y = i*dy
+                init_psi[i*N_y + j] = np.sin(4.0*np.pi*x) 
+                init_zeta[i*N_y + j] = -16.0*np.pi**2*np.sin(4.0*np.pi*x)
+    if case == 'gauss':
+        for i in range(0, N_x):
+            for j in range(0, N_y):
+                x = i*dx
+#                y = i*dy
+                sigma = 0.1
+                init_psi[i] = np.exp(-((x-0.5)/sigma)**2)
+                init_zeta[i] = 4.0*((x-0.5)/sigma**2)**2 - (2/sigma**2)*np.exp(-((x-0.5)/sigma)**2)
+    
     return init_psi, init_zeta
 
 
-def leapfrog(N_x,N_y, dx,dy, T, dt):
-    psi_0, zeta_0 = initialize(N_x, N_y, dx, dy)
+
+def center(N_x,N_y, dx,dy, T, dt, case):
+    psi_0, zeta_0 = initialize(N_x, N_y, dx, dy, case)
 
     alpha = dt/(2*dx)
     gamma =  dt/dx
@@ -68,10 +79,10 @@ def leapfrog(N_x,N_y, dx,dy, T, dt):
 
     psi_prev = np.linalg.solve(A, rhs_poisson)
 
-    data_out = np.zeros((N_x*N_y, int(float(T)/dt)+1))
+    data_out = np.zeros((N_x*N_y+1, int(float(T)/dt)+1))
     t = 0.0
     data_out[0,0] = t
-    data_out[1:, 0] = psi_0[:-1]
+    data_out[1:, 0] = psi_0[:]
     n = 0
     n2 = 1
 
@@ -102,7 +113,7 @@ def leapfrog(N_x,N_y, dx,dy, T, dt):
         t += dt
         if (n % 50 == 0):
             data_out[0, n2] = t
-            data_out[1:, n2] = psi_curr[:]
+            data_out[2:, n2] = psi_curr[:]
             
             n2 += 1
 
@@ -122,19 +133,44 @@ if __name__ == "__main__":
     N_x = int(L/dx + 1)
     N_y = int(L/dy +1)
 
-
-    outstuff2 = leapfrog(N_x, N_y, dx,dy, T, dt)
-
-#    psiE_gauss = euler(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
-#    psiLF_gauss = leapfrog(init_psi_gauss, init_zeta_gauss, N, dx, T, dt)
-
-    #x = np.linspace(0, 1, N-1)
-
-    #plt.figure()
-    #plt.plot(x, outstuff[:,0], 'r-')
-    #plt.plot(x, outstuff2[:,0], 'b-.')
-
-
-#    plt.figure()
-#    plt.plot(x, psiE_gauss[1:N-3], 'r-')
-#    plt.plot(x, psiLF_gauss[1:N-3], 'b-.')
+    data_out_sine = center(N_x, N_y, dy, dx, T, dt, 'sine')
+    
+#    t = data_out[0,:]
+    psi_sine = data_out_sine[1:, :200]
+    new_psi_sine = np.zeros((41, 41, 200))
+    for t in range(0, 200):
+        new_psi_sine[:,:, t] = psi_sine[:, t].reshape(41,41).transpose()
+    
+    x = np.linspace(0, 1, 41)
+    y = np.linspace(0, 1, 41)
+    
+    plt.style.use("ggplot")
+    fig = plt.figure(figsize = (9,7))
+    CS = plt.contourf(x, y, new_psi_sine[:,:,0], 20, cmap = plt.cm.RdBu_r)
+    plt.colorbar(CS, orientation = "vertical")
+    plt.title(r'Contour field of $\psi(x, y, 0) in the periodic domain$', fontsize = 15)
+    plt.xlabel('x', fontsize = 13)
+    plt.ylabel('y', fontsize = 13)
+    plt.savefig('/figs/sine_periodic_2d.pdf', bbox_inches = 'thight')
+    
+    
+    data_out_gauss = center(N_x, N_y, dy, dx, T, dt)
+    
+#    t = data_out[0,:]
+    psi_gauss = data_out_gauss[1:, :200]
+    new_psi_gauss = np.zeros((41, 41, 200))
+    for t in range(0, 200):
+        new_psi_gauss[:,:, t] = psi_gauss[:, t].reshape(41,41).transpose()
+    
+    x = np.linspace(0, 1, 41)
+    y = np.linspace(0, 1, 41)
+    
+    plt.style.use("ggplot")
+    fig = plt.figure(figsize = (9,7))
+    CS = plt.contourf(x, y, new_psi_gauss[:,:,0], 20, cmap = plt.cm.RdBu_r)
+    plt.colorbar(CS, orientation = "vertical")
+    plt.title(r'Contour field of $\psi(x, y, 0) in the periodic domain$', fontsize = 15)
+    plt.xlabel('x', fontsize = 13)
+    plt.ylabel('y', fontsize = 13)
+    plt.savefig('/figs/gauss_periodic_2d.pdf', bbox_inches = 'thight')
+ 

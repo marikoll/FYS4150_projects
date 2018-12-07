@@ -40,14 +40,12 @@ def initialize(N, dx, case):
             sigma = 0.1
             init_psi[i] = np.exp(-((x-0.5)/sigma)**2)
             init_zeta[i] = 4.0*((x-0.5)/sigma**2)**2 - (2/sigma**2)*np.exp(-((x-0.5)/sigma)**2)
-        
-    
 
     return init_psi, init_zeta
 
 def euler_fwd(N_x, dx, T, dt, case):
     psi_0, zeta_0 = initialize(N_x, dx, case)
-    alpha = dt/(2*dx)
+    alpha = dt/(dx*2)
     dx2 = dx**2
     
     psi_prev = np.zeros(N_x)
@@ -66,7 +64,7 @@ def euler_fwd(N_x, dx, T, dt, case):
     outstuff = np.zeros((N_x, int(float(T)/dt)+2))
     t = 0.0
     outstuff[0,0] = t
-    outstuff[1:, 0] = psi_0[:-1]
+    outstuff[1:, 0] = psi_0[:]
     n = 0
     n2 = 1
     while t < T:
@@ -125,14 +123,14 @@ def center(N_x, dx, T, dt, case):
         zeta_prev[i] = zeta_0[i] - alpha*(psi_0[i+1] - psi_0[i-1])
 
     zeta_prev[0] = zeta_0[0] - alpha*(psi_0[1] - psi_0[N_x-2])
-    zeta_prev[N_x-1] = zeta_0[0]    
+    zeta_prev[-1] = zeta_0[0]    
 
     
     # store data
-    data_out = np.zeros((N_x, int(float(T)/dt)+1))
+    data_out = np.zeros((N_x+1, int(float(T)/dt)+1))
     t = 0.0
     data_out[0,0] = t
-    data_out[1:, 0] = psi_0[:-1]
+    data_out[1:, 0] = psi_0[:]
     n = 0
     n2 = 1
     
@@ -143,7 +141,8 @@ def center(N_x, dx, T, dt, case):
             zeta_curr[i] = zeta_prev[i] - gamma*(psi_prev[i+1] - psi_prev[i-1])
         
         zeta_curr[0] = zeta_prev[0] - gamma*(psi_prev[1] - psi_prev[N_x-2])
-        zeta_curr[N_x-1] = zeta_curr[0]
+        zeta_curr[-1] = zeta_curr[0]
+        
 
         for i in range(0, N_x-1):
             rhs_poisson[i] = -dx2*zeta_curr[i]
@@ -161,7 +160,7 @@ def center(N_x, dx, T, dt, case):
         #saving every 20th point
         if (n % 20 == 0):
             data_out[0, n2] = t
-            data_out[1:, n2] = psi_curr[:]
+            data_out[2:, n2] = psi_curr[:]
             
             n2 += 1
 
@@ -188,23 +187,38 @@ if __name__ == "__main__":
 #    psi_center_sine = psi_center_sine[:,0::20]
 #    psi_center_gauss = psi_center_gauss[:,0::20]
 #    
-    x = np.linspace(0,L,(N-1))
-    t = np.linspace(0,T,N-1)
+    x = np.linspace(0,L,N)
+    t = np.linspace(0,T,N)
 
-    
-    T, X = np.meshgrid(t, x,sparse=False)
 
-    plt.figure(1)
-    plt.contourf(t, x, psi_center_sine[1:, :40])
-    plt.colorbar()
-    plt.show()
+
+#    plt.figure(1)
+#    plt.contourf(t, x, psi_center_sine[1:, :40])
+#    plt.colorbar()
+#    plt.show()
+#    
+#    plt.figure(2)
+#    plt.contourf(t, x,psi_center_gauss[1:, :40])
+#    plt.colorbar()
+#    plt.show()  
+#    
+    plt.figure(3)
+    plt.style.use("ggplot")
+    fig = plt.figure(figsize = (9,7))
+    CS = plt.contourf(x, t, psi_center_gauss[1:, :41].transpose(), 20, cmap = plt.cm.RdBu_r)
+    plt.colorbar(CS, orientation = "vertical")
+    plt.xlabel('x', fontsize = 13)
+    plt.ylabel('time, t', fontsize = 13)
+    plt.title(r'Hovmüller diagram of $\psi(x, t)$')
     
-    plt.figure(2)
-    plt.contourf(t, x,psi_center_gauss[1:, :40])
-    plt.colorbar()
-    plt.show()    
-    
-    
+    plt.figure(4)
+    plt.style.use("ggplot")
+    fig = plt.figure(figsize = (9,7))
+    CS = plt.contourf(x, t, psi_center_sine[1:, :41].transpose(), 20, cmap = plt.cm.RdBu_r)
+    plt.colorbar(CS, orientation = "vertical")
+    plt.xlabel('x', fontsize = 13)
+    plt.ylabel('time, t', fontsize = 13)
+    plt.title(r'Hovmüller diagram of $\psi(x, t)$')
     
 #    psi_center = center(N, dx, T, dt, case = 'sine')
 #
