@@ -68,7 +68,7 @@ def leapfrog(N_x,N_y, dx,dy, T, dt):
 
     psi_prev = np.linalg.solve(A, rhs_poisson)
 
-    data_out = np.zeros((N_x*N_y-1, int(float(T)/dt)+1))
+    data_out = np.zeros((N_x*N_y, int(float(T)/dt)+1))
     t = 0.0
     data_out[0,0] = t
     data_out[1:, 0] = psi_0[:-1]
