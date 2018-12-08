@@ -1,6 +1,6 @@
 import numpy as np
 
-def poission_jacobi(g, bc_0y, bc_1y, bc_0x, bc_1x, dx, dy, N_x, N_y, max_iter, f):
+def poisson_jacobi(g, bc_0y, bc_1y, bc_0x, bc_1x, dx, dy, N_x, N_y, max_iter, f):
     dxdx = dx**2
     dydy = dy**2
     dxdxdydy = dxdx*dydy
@@ -34,7 +34,7 @@ def poission_jacobi(g, bc_0y, bc_1y, bc_0x, bc_1x, dx, dy, N_x, N_y, max_iter, f
         iterations += 1
     return f
 
-
+    
 def poisson_jacobi_periodic(g, dx, dy, N_x, N_y, max_iter, f):
     dxdx = dx*dx
     dydy = dy*dy

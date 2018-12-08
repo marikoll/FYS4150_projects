@@ -1,7 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from poisson_solver import poission_jacobi
+from poisson_solver import poisson_jacobi
 
 
 def tridiag(b, y, N, soltn):
@@ -22,16 +22,22 @@ def tridiag(b, y, N, soltn):
     return soltn
 
 def initialize(N_x, N_y, dx, dy, case):
-    init_psi = np.zeros(N_x*N_y)
-    init_zeta = np.zeros(N_x*N_y)
+    init_psi = np.zeros((N_x,N_y))
+    init_zeta = np.zeros((N_x,N_y))
     
     if case == 'sine':
         for i in range(0, N_x):
             for j in range(0, N_y):
                 x = i*dx
                 y = i*dy
-                init_psi[i*N_y + j] = np.sin(np.pi*y)*np.sin(4.0*np.pi*x) 
-                init_zeta[i*N_y + j] = -17.0*np.pi**2*np.sin(4.0*np.pi*x)*np.sin(np.pi*y)
+                init_psi[i, j] = np.sin(np.pi*y)*np.sin(4.0*np.pi*x) 
+                init_zeta[i, j] = -17.0*np.pi**2*np.sin(4.0*np.pi*x)*np.sin(np.pi*y)
+                if i==0 or j == 0:
+                    init_psi[i, j] = 0.0
+                    init_zeta[i, j] = 0.0
+                if i==N_x-1 or j == N_y-1:
+                    init_psi[i, j] = 0.0
+                    init_zeta[i, j] = 0.0
     if case == 'gauss':
         for i in range(0, N_x):
             for j in range(0, N_y):
@@ -40,7 +46,14 @@ def initialize(N_x, N_y, dx, dy, case):
                 sigma = 0.1
                 init_psi[i] = np.exp(-((x-0.5)/sigma)**2)
                 init_zeta[i] = 4.0*((x-0.5)/sigma**2)**2 - (2/sigma**2)*np.exp(-((x-0.5)/sigma)**2)
-    
+                if i==0 or j == 0:
+                    init_psi[i, j] = 0.0
+                    init_zeta[i, j] = 0.0
+                if i==N_x-1 or j == N_y-1:
+                    init_psi[i, j] = 0.0
+                    init_zeta[i, j] = 0.0
+    init_psi = init_psi.reshape(N_x*N_y)
+    init_zeta = init_zeta.reshape(N_x*N_y)
     return init_psi, init_zeta
 
 
@@ -83,7 +96,7 @@ def center(N_x, N_y, dy, dx, T, dt, case):
             alpha*(psi_0[(i+1)*N_y + j] - psi_0[(i-1)*N_y + j])
     
     
-    psi_prev = poission_jacobi(zeta_prev, bc_0y, bc_Ny, bc_0x, bc_Nx, dx, dy, N_x, \
+    psi_prev = poisson_jacobi(zeta_prev, bc_0y, bc_Ny, bc_0x, bc_Nx, dx, dy, N_x, \
                                N_y, 50, psi_prev)
     
 
@@ -100,7 +113,7 @@ def center(N_x, N_y, dy, dx, T, dt, case):
                 zeta_curr[i*N_y + j] = zeta_pp[i*N_y + j] - \
                 gamma*(psi_prev[(i+1)*N_y + j] - psi_prev[(i-1)*N_y + j])
         
-        psi_curr = poission_jacobi(zeta_curr, bc_0y, bc_Ny, bc_0x, bc_Nx, dx, dy, N_x, \
+        psi_curr = poisson_jacobi(zeta_curr, bc_0y, bc_Ny, bc_0x, bc_Nx, dx, dy, N_x, \
                                N_y, 50, psi_curr)
 
         for i in range(1, N_x -1):

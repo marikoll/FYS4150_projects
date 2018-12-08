@@ -61,10 +61,10 @@ def euler_fwd(N_x, dx, T, dt, case):
     psi_prev  = psi_0
     zeta_prev = zeta_0
     
-    outstuff = np.zeros((N_x, int(float(T)/dt)+2))
+    out_data = np.zeros((N_x+1, int(float(T)/dt)+2))
     t = 0.0
-    outstuff[0,0] = t
-    outstuff[1:, 0] = psi_0[:]
+    out_data[0,0] = t
+    out_data[1:, 0] = psi_0[:]
     n = 0
     n2 = 1
     while t < T:
@@ -72,11 +72,11 @@ def euler_fwd(N_x, dx, T, dt, case):
         for i in range(1, N_x-1):
             zeta_curr[i] = zeta_prev[i] - alpha*(psi_prev[i+1] - psi_prev[i-1])
             
-        zeta_curr[0] = zeta_prev[0] - alpha*(psi_prev[1] - psi_prev[N_x -2])
-        zeta_curr[N_x-1] = zeta_curr[0]
+        zeta_curr[0] = zeta_prev[0] - alpha*(psi_prev[1] - psi_prev[-2])
+        zeta_curr[-1] = zeta_curr[0]
     
         for i in range(0, N_x-1):
-            rhs_poisson[i] = -dx2*zeta_curr[i]
+            rhs_poisson[i] = dx2*zeta_curr[i]
     
         psi_curr = np.linalg.solve(A, rhs_poisson)
     
@@ -89,13 +89,13 @@ def euler_fwd(N_x, dx, T, dt, case):
         
         t += dt
         if (n % 20 == 0):
-            outstuff[0, n2] = t
-            outstuff[1:, n2] = psi_curr[:]
+            out_data[0, n2] = t
+            out_data[2:, n2] = psi_curr[:]
             n2 += 1
  
         n += 1
 
-    return outstuff   
+    return out_data   
         
 def center(N_x, dx, T, dt, case):
     psi_0, zeta_0 = initialize(N_x, dx, case)
@@ -122,15 +122,15 @@ def center(N_x, dx, T, dt, case):
     for i in range(1, N_x-1):
         zeta_prev[i] = zeta_0[i] - alpha*(psi_0[i+1] - psi_0[i-1])
 
-    zeta_prev[0] = zeta_0[0] - alpha*(psi_0[1] - psi_0[N_x-2])
+    zeta_prev[0] = zeta_0[0] - alpha*(psi_0[1] - psi_0[-2])
     zeta_prev[-1] = zeta_0[0]    
 
     
     # store data
-    data_out = np.zeros((N_x+1, int(float(T)/dt)+1))
+    out_data = np.zeros((N_x+1, int(float(T)/dt)+1))
     t = 0.0
-    data_out[0,0] = t
-    data_out[1:, 0] = psi_0[:]
+    out_data[0,0] = t
+    out_data[1:, 0] = psi_0[:]
     n = 0
     n2 = 1
     
@@ -140,12 +140,12 @@ def center(N_x, dx, T, dt, case):
         for i in range(1, N_x-1):
             zeta_curr[i] = zeta_prev[i] - gamma*(psi_prev[i+1] - psi_prev[i-1])
         
-        zeta_curr[0] = zeta_prev[0] - gamma*(psi_prev[1] - psi_prev[N_x-2])
+        zeta_curr[0] = zeta_prev[0] - gamma*(psi_prev[1] - psi_prev[-2])
         zeta_curr[-1] = zeta_curr[0]
         
 
         for i in range(0, N_x-1):
-            rhs_poisson[i] = -dx2*zeta_curr[i]
+            rhs_poisson[i] = dx2*zeta_curr[i]
 
         psi_curr = np.linalg.solve(A, rhs_poisson)
 
@@ -159,21 +159,21 @@ def center(N_x, dx, T, dt, case):
         t += dt
         #saving every 20th point
         if (n % 20 == 0):
-            data_out[0, n2] = t
-            data_out[2:, n2] = psi_curr[:]
+            out_data[0, n2] = t
+            out_data[2:, n2] = psi_curr[:]
             
             n2 += 1
 
         n += 1
 
-    return data_out   
+    return out_data   
 
 
         
 if __name__ == "__main__":
 
     T = 200
-    dt = 0.25
+    dt = 0.001
     
     dx = 1.0/40
     L = 1.0
@@ -242,24 +242,12 @@ if __name__ == "__main__":
 #    
 #    psi_euler4 = euler_fwd(N, dx, T, dt4, case = 'sine')
 #    
-#    x = np.linspace(0, 1, N-1)
+#    x = np.linspace(0, 1, N)
 #
-#   
-#    outstuff = euler_fwd(N, dx, T, dt, case = 'sine')
-#    outstuff2 = center(N, dx, T, dt, case = 'sine')
-#    plt.figure()
-#    plt.plot(outstuff, 'r-', label = 'Euler')
-#    plt.plot(outstuff2[1:,1], 'b-.', label = 'Centered')
-#    plt.legend()
-#    plt.title(r'Streamfunction $\psi(x, t)$ at $t = {}$ with $\Delta t = {:.3f}$'\
-#          .format(T, dt), fontsize = 15)
-#    plt.xlabel('x', fontsize = 12)
-#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-
-    
- 
-
+#
+#    
+# 
+#
 #    plt.figure(2, figsize = (10, 8))
 #    plt.subplot(221)
 #    plt.plot(x, psi_euler[1:,1], 'r-', label = 'Euler')
@@ -297,10 +285,25 @@ if __name__ == "__main__":
 #    plt.xlabel('x', fontsize = 12)
 ##    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
 #    plt.grid()
-##    plt.savefig('figs/subplots_periodic1D.pdf')
+#    plt.savefig('figs/subplots_periodic1D.pdf')
 
 
-   
+
+
+
+#   
+#    outstuff = euler_fwd(N, dx, T, dt, case = 'sine')
+#    outstuff2 = center(N, dx, T, dt, case = 'sine')
+#    plt.figure()
+#    plt.plot(outstuff, 'r-', label = 'Euler')
+#    plt.plot(outstuff2[1:,1], 'b-.', label = 'Centered')
+#    plt.legend()
+#    plt.title(r'Streamfunction $\psi(x, t)$ at $t = {}$ with $\Delta t = {:.3f}$'\
+#          .format(T, dt), fontsize = 15)
+#    plt.xlabel('x', fontsize = 12)
+#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+#    plt.grid()
+
         
         
         

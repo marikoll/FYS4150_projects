@@ -12,8 +12,8 @@ def periodic_matrix(n_rows, n_cols):
                 A[i, j] = 2.0
             elif abs(i-j) ==1:
                 A[i,j] = -1.0
-    A[0, n_cols-1] = -1.0
-    A[n_rows -1, 0] = -1.0
+#    A[0, n_cols-1] = -2.0
+#    A[n_rows -1, 0] = -2.0
 
     return A
 
@@ -74,11 +74,11 @@ def center(N_x,N_y, dx,dy, T, dt, case):
                  - psi_0[(N_x -2)*N_y + j])
         zeta_prev[(N_x-1)*N_y + j] = zeta_prev[0*N_y + j]
 
-    for i in range(0, N_x-1):
-        rhs_poisson[i] = -dx2*zeta_prev[i]
-
-    psi_prev = np.linalg.solve(A, rhs_poisson)
-
+#    for i in range(0, N_x-1):
+#        rhs_poisson[i] = -dx2*zeta_prev[i]
+#
+#    psi_prev = np.linalg.solve(A, rhs_poisson)
+#
     data_out = np.zeros((N_x*N_y+1, int(float(T)/dt)+1))
     t = 0.0
     data_out[0,0] = t
@@ -154,23 +154,23 @@ if __name__ == "__main__":
     plt.savefig('figs/sine_periodic_2d.pdf', bbox_inches = 'tight')
     
     
-    data_out_gauss = center(N_x, N_y, dy, dx, T, dt, 'gauss')
-    
-#    t = data_out[0,:]
-    psi_gauss = data_out_gauss[1:, :200]
-    new_psi_gauss = np.zeros((41, 41, 200))
-    for t in range(0, 200):
-        new_psi_gauss[:,:, t] = psi_gauss[:, t].reshape(41,41).transpose()
-    
-    x = np.linspace(0, 1, 41)
-    y = np.linspace(0, 1, 41)
-    
-    plt.style.use("ggplot")
-    fig = plt.figure(figsize = (9,7))
-    CS = plt.contourf(x, y, new_psi_gauss[:,:,0], 20, cmap = plt.cm.RdBu_r)
-    plt.colorbar(CS, orientation = "vertical")
-    plt.title(r'Contour field of $\psi(x, y, 0)$ in the periodic domain', fontsize = 15)
-    plt.xlabel('x', fontsize = 13)
-    plt.ylabel('y', fontsize = 13)
-    plt.savefig('figs/gauss_periodic_2d.pdf', bbox_inches = 'tight')
+#    data_out_gauss = center(N_x, N_y, dy, dx, T, dt, 'gauss')
+#    
+##    t = data_out[0,:]
+#    psi_gauss = data_out_gauss[1:, :200]
+#    new_psi_gauss = np.zeros((41, 41, 200))
+#    for t in range(0, 200):
+#        new_psi_gauss[:,:, t] = psi_gauss[:, t].reshape(41,41).transpose()
+#    
+#    x = np.linspace(0, 1, 41)
+#    y = np.linspace(0, 1, 41)
+#    
+#    plt.style.use("ggplot")
+#    fig = plt.figure(figsize = (9,7))
+#    CS = plt.contourf(x, y, new_psi_gauss[:,:,0], 20, cmap = plt.cm.RdBu_r)
+#    plt.colorbar(CS, orientation = "vertical")
+#    plt.title(r'Contour field of $\psi(x, y, 0)$ in the periodic domain', fontsize = 15)
+#    plt.xlabel('x', fontsize = 13)
+#    plt.ylabel('y', fontsize = 13)
+#    plt.savefig('figs/gauss_periodic_2d.pdf', bbox_inches = 'tight')
  

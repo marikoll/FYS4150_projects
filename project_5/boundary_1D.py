@@ -44,8 +44,8 @@ def initialize(N, dx, case):
 
     init_psi[-1] = 0.0
     init_psi[0] = 0.0
-    init_zeta[-1] = 0.0
-    init_zeta[0] = 0.0
+#    init_zeta[-1] = 0.0
+#    init_zeta[0] = 0.0
     
     return init_psi, init_zeta
 
@@ -78,10 +78,12 @@ def euler_fwd(N_x, dx, T, dt, case):
     psi_curr[0] = bc_0; psi_curr[N_x-1] = bc_N 
     zeta_curr[0] = zeta_prev[0]; zeta_curr[N_x-1] = zeta_prev[N_x-1]
 
-    out_data = np.zeros((N_x, int(float(T)/dt)))
+    out_data = np.zeros((N_x+1, int(float(T)/dt)+2))
     t = 0.0
+    out_data[0,0] = t
+    out_data[1:, 0] = psi_0[:]
     n = 0
-
+    n2 = 1
     while t < T:
         # forward Euler:
         for i in range(1, N_x-2):
@@ -95,7 +97,10 @@ def euler_fwd(N_x, dx, T, dt, case):
         
         t += dt
         if (n % 20 == 0):
-            out_data[:, n] = psi_curr[:]
+            out_data[0, n2] = t
+            out_data[1:, n2] = psi_curr[:]
+            n2 += 1
+ 
         n += 1
  
     return out_data
@@ -129,18 +134,18 @@ def center(N_x, dx, T, dt, case):
 
 
     #initial Euler:
-    for i in range(1, N_x-2):
+    for i in range(1, N_x-1):
         zeta_prev[i] = zeta_0[i] - alpha*(psi_0[i+1] - psi_0[i-1])
-#    for i in range(1, N_x-2):
+#    for i in range(1, N_x-1):
 #        rhs_diag[i-1] = -dx2*zeta_prev[i]
 #
 #   
 #    psi_prev = tridiag(diag, rhs_diag, N_x-2, psi_prev)
 #    print(psi_prev[1:10])
-    data_out = np.zeros((N_x+1, int(float(T)/dt)))
+    out_data = np.zeros((N_x+1, int(float(T)/dt)))
     t = 0.0
-    data_out[0,0] = t
-    data_out[1:, 0] = psi_0[:]
+    out_data[0,0] = t
+    out_data[1:, 0] = psi_0[:]
     n = 0
     n2 = 1
 
@@ -157,21 +162,21 @@ def center(N_x, dx, T, dt, case):
             zeta_prev[i] = zeta_curr[i]
         t += dt
         if (n % 20 == 0):
-            data_out[0, n2] = t
-            data_out[1:, n2] = psi_curr[:]
+            out_data[0, n2] = t
+            out_data[1:, n2] = psi_curr[:]
             
             n2 += 1
 
         n += 1
 
-    return data_out   
+    return out_data   
 
 
 
 
 if __name__ == "__main__":
 
-    T = 150
+    T = 200
     dt = 0.2
 
     dx = 1.0/40
@@ -179,9 +184,10 @@ if __name__ == "__main__":
     N = int(L/dx + 1)
  
 
-    psi_center_sine = center(N, dx, T, dt, 'gauss')
+    psi_center_sine = center(N, dx, T, dt, 'sine')
+    psi_center_gauss = center(N, dx, T, dt, 'gauss')
 
-#    psi_euler= euler_fwd(N, dx, T, dt)
+
     
     x = np.linspace(0,L,N)
     t = np.linspace(0,T,N)
@@ -190,30 +196,91 @@ if __name__ == "__main__":
     plt.figure(1)
     plt.style.use("ggplot")
     fig = plt.figure(figsize = (9,7))
-    CS = plt.contourf(x, t, psi_center_sine[1:, :41].transpose(), 20, cmap = plt.cm.RdBu_r)
+    CS = plt.contourf(x, t[:5], psi_center_sine[1:, :5].transpose(), 20, cmap = plt.cm.RdBu_r)
     plt.colorbar(CS, orientation = "vertical")
+    plt.xlabel('x', fontsize = 13)
+    plt.ylabel('time, t', fontsize = 13)
+    plt.title(r'Hovmüller diagram of $\psi(x, t)$')
+    
+    plt.figure(2)
+    plt.style.use("ggplot")
+    fig = plt.figure(figsize = (9,7))
+    CS = plt.contourf(x, t, psi_center_gauss[1:, :41].transpose(), 20, cmap = plt.cm.RdBu_r)
+    plt.colorbar(CS, orientation = "vertical")
+    plt.xlabel('x', fontsize = 13)
+    plt.ylabel('time, t', fontsize = 13)
+    plt.title(r'Hovmüller diagram of $\psi(x, t)$')
+        
     
 
+
+    
+#    psi_center = center(N, dx, T, dt, 'sine')
+#    psi_euler= euler_fwd(N, dx, T, dt, 'sine')
+#
 #    dt2 = 0.01
 #    
-#    psi_center2 = center(N, dx, T, dt2)
+#    psi_center2 = center(N, dx, T, dt2, 'sine')
 #    
-#    psi_euler2 = euler_fwd(N, dx, T, dt2)
+#    psi_euler2 = euler_fwd(N, dx, T, dt2, 'sine')
 #    
 #    dt3 = 0.2
 #    
-#    psi_center3 = center(N, dx, T, dt3)
+#    psi_center3 = center(N, dx, T, dt3, 'sine')
 #    
-#    psi_euler3 = euler_fwd(N, dx, T, dt3)
+#    psi_euler3 = euler_fwd(N, dx, T, dt3, 'sine')
 #    
 #    dt4 = 1.0
 #    
-#    psi_center4 = center(N, dx, T, dt4)
+#    psi_center4 = center(N, dx, T, dt4, 'sine')
 #    
-#    psi_euler4 = euler_fwd(N, dx, T, dt4)
+#    psi_euler4 = euler_fwd(N, dx, T, dt4, 'sine')
 #    
 #    x = np.linspace(0, 1, N-1)
 #
+#
+#
+#    plt.figure(2, figsize = (10, 8))
+#    plt.subplot(221)
+#    plt.plot(x, psi_euler[1:-1,1], 'r-', label = 'Euler')
+#    plt.plot(x, psi_center[1:-1:,1], 'b-.', label = 'Centered')
+#    plt.legend()
+#    plt.title(r'$\Delta t = {:.3f}$'\
+#              .format(dt), fontsize = 15)
+##    plt.xlabel('x', fontsize = 12)
+#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+#    plt.grid()
+#    plt.subplot(222)
+#    plt.plot(x, psi_euler2[1:-1,1], 'r-', label = 'Euler')
+#    plt.plot(x, psi_center2[1:-1,1], 'b-.', label = 'Centered')
+#    plt.legend()
+#    plt.title(r'$\Delta t = {:.3f}$'\
+#              .format(dt2), fontsize = 15)
+##    plt.xlabel('x', fontsize = 12)
+##    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+#    plt.grid()
+#    plt.subplot(223)
+#    plt.plot(x, psi_euler3[1:-1,1], 'r-', label = 'Euler')
+#    plt.plot(x, psi_center3[1:-1,1], 'b-.', label = 'Centered')
+#    plt.legend()
+#    plt.title(r'$\Delta t = {:.2f}$'\
+#              .format(dt3), fontsize = 15)
+#    plt.xlabel('x', fontsize = 12)
+#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+#    plt.grid()
+#    plt.subplot(224)
+#    plt.plot(x, psi_euler4[1:-1,1], 'r-', label = 'Euler')
+#    plt.plot(x, psi_center4[1:-1,1], 'b-.', label = 'Centered')
+#    plt.legend()
+#    plt.title(r'$\Delta t = {:.1f}$'\
+#              .format(dt4), fontsize = 15)
+#    plt.xlabel('x', fontsize = 12)
+##    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+#    plt.grid()
+#    plt.savefig('figs/subplots_boundary1D.pdf')
+
+
+
 #    plt.figure(1)
 #    plt.plot(x, psi_euler[:-1,0], 'r-', label = 'Euler')
 #    plt.plot(x, psi_center[:-1,0], 'b-.', label = 'Centered')
@@ -225,49 +292,6 @@ if __name__ == "__main__":
 #    plt.grid()
 ##    plt.savefig('figs/boundary_T{}_dt{}.pdf'.format(T, str(dt)), bbox_inches = 'tight')
 #    plt.show()
-
-#
-#    plt.figure(2, figsize = (10, 8))
-#    plt.subplot(221)
-#    plt.plot(x, psi_euler[:-1,0], 'r-', label = 'Euler')
-#    plt.plot(x, psi_center[:-1,0], 'b-.', label = 'Centered')
-#    plt.legend()
-#    plt.title(r'$\Delta t = {:.3f}$'\
-#              .format(dt), fontsize = 15)
-##    plt.xlabel('x', fontsize = 12)
-#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-#    plt.subplot(222)
-#    plt.plot(x, psi_euler2[:-1,0], 'r-', label = 'Euler')
-#    plt.plot(x, psi_center2[:-1,0], 'b-.', label = 'Centered')
-#    plt.legend()
-#    plt.title(r'$\Delta t = {:.3f}$'\
-#              .format(dt2), fontsize = 15)
-##    plt.xlabel('x', fontsize = 12)
-##    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-#    plt.subplot(223)
-#    plt.plot(x, psi_euler3[:-1,0], 'r-', label = 'Euler')
-#    plt.plot(x, psi_center3[:-1,0], 'b-.', label = 'Centered')
-#    plt.legend()
-#    plt.title(r'$\Delta t = {:.2f}$'\
-#              .format(dt3), fontsize = 15)
-#    plt.xlabel('x', fontsize = 12)
-#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-#    plt.subplot(224)
-#    plt.plot(x, psi_euler4[:-1,0], 'r-', label = 'Euler')
-#    plt.plot(x, psi_center4[:-1,0], 'b-.', label = 'Centered')
-#    plt.legend()
-#    plt.title(r'$\Delta t = {:.1f}$'\
-#              .format(dt4), fontsize = 15)
-#    plt.xlabel('x', fontsize = 12)
-##    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-#    plt.savefig('figs/subplots_boundary1D.pdf')
-
-
-
 
 
 
