@@ -67,7 +67,7 @@ def euler_fwd(N_x, dx, T, dt, case):
     
     
     # Arrays for tridiagonal solver
-    diag = np.ones(N_x-2)*(-1)
+    
     rhs_diag = np.zeros(N_x-2)
 
 
@@ -88,8 +88,11 @@ def euler_fwd(N_x, dx, T, dt, case):
         # forward Euler:
         for i in range(1, N_x-2):
             zeta_curr[i] = zeta_prev[i] - alpha*(psi_prev[i+1] - psi_prev[i-1])
+        
         for i in range(1, N_x-2):
             rhs_diag[i-1] = -dx2*zeta_curr[i]
+        
+        diag = np.ones(N_x-2)*(-1)
         psi_curr = tridiag(diag, rhs_diag, N_x -2, psi_curr)
         for i in range(1, N_x-2):
             psi_prev[i] = psi_curr[i]
@@ -122,7 +125,7 @@ def center(N_x, dx, T, dt, case):
     
     
     # Arrays for tridiagonal solver
-    diag = np.ones(N_x-2)*(-1)
+    
     rhs_diag = np.zeros(N_x-2)
     
     # initial condition and boundary conditions
@@ -154,6 +157,8 @@ def center(N_x, dx, T, dt, case):
             zeta_curr[i] = zeta_pp[i] - gamma*(psi_prev[i+1] - psi_prev[i-1])
         for i in range(1,N_x-2):
             rhs_diag[i-1] = -dx2*zeta_curr[i]
+        
+        diag = np.ones(N_x-2)*(-1)
         psi_curr = tridiag(diag, rhs_diag, N_x -2, psi_curr)
     
         for i in range(1, N_x -2):
@@ -196,7 +201,7 @@ if __name__ == "__main__":
     plt.figure(1)
     plt.style.use("ggplot")
     fig = plt.figure(figsize = (9,7))
-    CS = plt.contourf(x, t[:5], psi_center_sine[1:, :5].transpose(), 20, cmap = plt.cm.RdBu_r)
+    CS = plt.contourf(x, t, psi_center_sine[1:, :41].transpose(), 20, cmap = plt.cm.RdBu_r)
     plt.colorbar(CS, orientation = "vertical")
     plt.xlabel('x', fontsize = 13)
     plt.ylabel('time, t', fontsize = 13)

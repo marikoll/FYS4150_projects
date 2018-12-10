@@ -55,7 +55,7 @@ def euler_fwd(N_x, dx, T, dt, case):
 
     
     rhs_poisson = np.zeros(N_x-1)
-    A = periodic_matrix(int(N_x-1),int(N_x-1))
+    
     
     
     psi_prev  = psi_0
@@ -75,9 +75,10 @@ def euler_fwd(N_x, dx, T, dt, case):
         zeta_curr[0] = zeta_prev[0] - alpha*(psi_prev[1] - psi_prev[-2])
         zeta_curr[-1] = zeta_curr[0]
     
-        for i in range(0, N_x-1):
-            rhs_poisson[i] = dx2*zeta_curr[i]
-    
+        rhs_poisson = -dx2*zeta_curr[:-1]
+            
+        A = periodic_matrix(int(N_x-1),int(N_x-1))
+        
         psi_curr = np.linalg.solve(A, rhs_poisson)
     
         
@@ -111,7 +112,7 @@ def center(N_x, dx, T, dt, case):
 
     # To solve Ax = b
     rhs_poisson = np.zeros(N_x-1)
-    A = periodic_matrix(int(N_x-1),int(N_x-1))
+    
     
     
     # Initial conditions
@@ -144,9 +145,9 @@ def center(N_x, dx, T, dt, case):
         zeta_curr[-1] = zeta_curr[0]
         
 
-        for i in range(0, N_x-1):
-            rhs_poisson[i] = dx2*zeta_curr[i]
-
+        rhs_poisson = -dx2*zeta_curr[:-1]
+        
+        A = periodic_matrix(int(N_x-1),int(N_x-1))
         psi_curr = np.linalg.solve(A, rhs_poisson)
 
         psi_curr[-1] = psi_curr[0]
@@ -173,7 +174,7 @@ def center(N_x, dx, T, dt, case):
 if __name__ == "__main__":
 
     T = 200
-    dt = 0.001
+    dt = 0.2
     
     dx = 1.0/40
     L = 1.0
