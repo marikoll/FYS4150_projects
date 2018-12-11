@@ -1,7 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-#from poisson_solver import poisson_jacobi_periodic
+from scipy import linalg
 
 
 def periodic_matrix(n_rows, n_cols):
@@ -100,7 +100,7 @@ def center(N_x,N_y, dx,dy, T, dt, case):
         for i in range(0, N_x-1):
             rhs_poisson[i] = -dx2*zeta_curr[i]
 
-        psi_curr = np.linalg.solve(A, rhs_poisson)
+        psi_curr = linalg.solve(A, rhs_poisson)
         #poisson_jacobi_periodic(zeta_curr, dx, dt, N_x. N_y, 50, psi_curr)
 
         for i in range(0, N_x-1):

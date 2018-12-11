@@ -10,22 +10,39 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def tridiag(b, y, N, soltn):
+def tridiag(y, N, soltn):
     
-    b[0] = 2.0
-    
+    b = np.ones(N-2)*(-2.0)
+    d = np.ones(N-2)
     #forward substitution
-    for i in range(1, N):
-         b[i] = float(i + 2)/float(i + 1)
-         y[i] = y[i] + (float(y[i-1])/float(b[i-1]))
+    for i in range(1, N-3):
+         b[i] -= (d[i]*d[i-1])/b[i-1]
+         y[i] -= float(y[i-1])/float(b[i-1])
          
     #backward substitution
-    soltn[N-1] = float(y[N-1])/float(b[N-1])
     
-    for i in range(N-2, 0, -1):
-        soltn[i] = float(y[i] + soltn[i+1])/float(b[i])
     
+    for i in range(N-3, 1, -1):
+        soltn[i+2] = float(y[i] - soltn[i+1])/float(b[i])
+    soltn[-1] = soltn[0] = 0.0#float(y[-1])/float(b[-1])
     return soltn
+
+def tridiag2(psi, force, N):
+    e1 = np.ones(N)
+    e2 = np.ones(N)
+    d = np.ones(N)*(-2.0)
+
+    psi[-1] = 0.0
+    psi[0] = 0
+    
+    for i in range(2, N):
+        d[i] -= (e1[i]*e2[i-1])/d[i-1]
+        force[i] -= (e1[i]*force[i-1])/d[i-1]
+    for i in range(N-2, 1, -1):
+        psi[i] = (force[i] - e2[i]*psi[i+1])/d[i]
+        
+    return psi
+
 
 def initialize(N, dx, case):
     init_psi = np.zeros(N)
@@ -68,7 +85,7 @@ def euler_fwd(N_x, dx, T, dt, case):
     
     # Arrays for tridiagonal solver
     
-    rhs_diag = np.zeros(N_x-2)
+    
 
 
     # initial condition and boundary conditions
@@ -89,11 +106,13 @@ def euler_fwd(N_x, dx, T, dt, case):
         for i in range(1, N_x-2):
             zeta_curr[i] = zeta_prev[i] - alpha*(psi_prev[i+1] - psi_prev[i-1])
         
-        for i in range(1, N_x-2):
+        
+        rhs_diag = np.zeros(N_x-2)
+        for i in range(1, N_x-1):
             rhs_diag[i-1] = -dx2*zeta_curr[i]
         
-        diag = np.ones(N_x-2)*(-1)
-        psi_curr = tridiag(diag, rhs_diag, N_x -2, psi_curr)
+        
+        psi_curr = tridiag(rhs_diag, N_x, psi_curr)
         for i in range(1, N_x-2):
             psi_prev[i] = psi_curr[i]
             zeta_prev[i] = zeta_curr[i]
@@ -139,11 +158,11 @@ def center(N_x, dx, T, dt, case):
     #initial Euler:
     for i in range(1, N_x-1):
         zeta_prev[i] = zeta_0[i] - alpha*(psi_0[i+1] - psi_0[i-1])
-#    for i in range(1, N_x-1):
-#        rhs_diag[i-1] = -dx2*zeta_prev[i]
-#
-#   
-#    psi_prev = tridiag(diag, rhs_diag, N_x-2, psi_prev)
+    for i in range(1, N_x-1):
+        rhs_diag[i-1] = -dx2*zeta_prev[i]
+
+   
+    psi_prev = tridiag(rhs_diag, N_x, psi_prev)
 #    print(psi_prev[1:10])
     out_data = np.zeros((N_x+1, int(float(T)/dt)))
     t = 0.0
@@ -155,11 +174,12 @@ def center(N_x, dx, T, dt, case):
     while t < T:
         for i in range(1, N_x-2):
             zeta_curr[i] = zeta_pp[i] - gamma*(psi_prev[i+1] - psi_prev[i-1])
-        for i in range(1,N_x-2):
-            rhs_diag[i-1] = -dx2*zeta_curr[i]
+            
         
-        diag = np.ones(N_x-2)*(-1)
-        psi_curr = tridiag(diag, rhs_diag, N_x -2, psi_curr)
+        for i in range(1,N_x-1):
+            rhs_diag[i-1] = -dx2*zeta_curr[i]
+    
+        psi_curr = tridiag(rhs_diag, N_x, psi_curr)
     
         for i in range(1, N_x -2):
             psi_prev[i] = psi_curr[i]

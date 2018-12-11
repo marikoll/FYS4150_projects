@@ -8,6 +8,7 @@ Created on Mon Dec  3 15:22:26 2018
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import linalg
 
 
 
@@ -54,7 +55,7 @@ def euler_fwd(N_x, dx, T, dt, case):
     zeta_curr = np.zeros(N_x)
 
     
-    rhs_poisson = np.zeros(N_x-1)
+    rhs_poisson = np.zeros(N_x-2)
     
     
     
@@ -75,11 +76,11 @@ def euler_fwd(N_x, dx, T, dt, case):
         zeta_curr[0] = zeta_prev[0] - alpha*(psi_prev[1] - psi_prev[-2])
         zeta_curr[-1] = zeta_curr[0]
     
-        rhs_poisson = -dx2*zeta_curr[:-1]
+        rhs_poisson = -dx2*zeta_curr[1:-1]
             
-        A = periodic_matrix(int(N_x-1),int(N_x-1))
+        A = periodic_matrix(int(N_x-2),int(N_x-2))
         
-        psi_curr = np.linalg.solve(A, rhs_poisson)
+        psi_curr[1:-1] = np.linalg.solve(A, rhs_poisson)
     
         
         psi_curr[-1] = psi_curr[0]
@@ -91,7 +92,7 @@ def euler_fwd(N_x, dx, T, dt, case):
         t += dt
         if (n % 20 == 0):
             out_data[0, n2] = t
-            out_data[2:, n2] = psi_curr[:]
+            out_data[1:, n2] = psi_curr[:]
             n2 += 1
  
         n += 1
@@ -111,7 +112,7 @@ def center(N_x, dx, T, dt, case):
     zeta_curr = np.zeros(N_x)
 
     # To solve Ax = b
-    rhs_poisson = np.zeros(N_x-1)
+    rhs_poisson = np.zeros(N_x-2)
     
     
     
@@ -145,10 +146,10 @@ def center(N_x, dx, T, dt, case):
         zeta_curr[-1] = zeta_curr[0]
         
 
-        rhs_poisson = -dx2*zeta_curr[:-1]
+        rhs_poisson = -dx2*zeta_curr[1:-1]
         
-        A = periodic_matrix(int(N_x-1),int(N_x-1))
-        psi_curr = np.linalg.solve(A, rhs_poisson)
+        A = periodic_matrix(int(N_x-2),int(N_x-2))
+        psi_curr[1:-1] = np.linalg.solve(A, rhs_poisson)
 
         psi_curr[-1] = psi_curr[0]
         
@@ -161,7 +162,7 @@ def center(N_x, dx, T, dt, case):
         #saving every 20th point
         if (n % 20 == 0):
             out_data[0, n2] = t
-            out_data[2:, n2] = psi_curr[:]
+            out_data[1:, n2] = psi_curr[:]
             
             n2 += 1
 
@@ -182,12 +183,12 @@ if __name__ == "__main__":
     
 
 
-    psi_center_sine = center(N, dx, T, dt, case = 'sine')
-    psi_center_gauss = center(N, dx, T, dt, case = 'gauss')
+    psi_center_sine = euler_fwd(N, dx, T, dt, case = 'sine')
+#    psi_center_gauss = euler_fwd(N, dx, T, dt, case = 'gauss')
     
-#    psi_center_sine = psi_center_sine[:,0::20]
-#    psi_center_gauss = psi_center_gauss[:,0::20]
-#    
+##    psi_center_sine = psi_center_sine[:,0::20]
+##    psi_center_gauss = psi_center_gauss[:,0::20]
+##    
     x = np.linspace(0,L,N)
     t = np.linspace(0,T,N)
 
@@ -203,15 +204,15 @@ if __name__ == "__main__":
 #    plt.colorbar()
 #    plt.show()  
 #    
-    plt.figure(3)
-    plt.style.use("ggplot")
-    fig = plt.figure(figsize = (9,7))
-    CS = plt.contourf(x, t, psi_center_gauss[1:, :41].transpose(), 20, cmap = plt.cm.RdBu_r)
-    plt.colorbar(CS, orientation = "vertical")
-    plt.xlabel('x', fontsize = 13)
-    plt.ylabel('time, t', fontsize = 13)
-    plt.title(r'Hovmüller diagram of $\psi(x, t)$')
-    
+#    plt.figure(3)
+#    plt.style.use("ggplot")
+#    fig = plt.figure(figsize = (9,7))
+#    CS = plt.contourf(x, t, psi_center_gauss[1:, :41].transpose(), 20, cmap = plt.cm.RdBu_r)
+#    plt.colorbar(CS, orientation = "vertical")
+#    plt.xlabel('x', fontsize = 13)
+#    plt.ylabel('time, t', fontsize = 13)
+#    plt.title(r'Hovmüller diagram of $\psi(x, t)$')
+#    
     plt.figure(4)
     plt.style.use("ggplot")
     fig = plt.figure(figsize = (9,7))
