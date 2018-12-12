@@ -40,7 +40,7 @@ def periodic_matrix(n_rows, n_cols):
     return A
 
 
-def initialize(N, dx, case):
+def initialize(N, dx, case, sigma = None):
     init_psi = np.zeros(N)
     init_zeta = np.zeros(N)
     if case == 'sine':
@@ -51,7 +51,7 @@ def initialize(N, dx, case):
     if case == 'gauss':
         for i in range(0, N):
             x = i*dx
-            sigma = 0.1
+            #sigma = 0.5
             init_psi[i] = np.exp(-((x-0.5)/sigma)**2)
             init_zeta[i] = 4.0*((x-0.5)/sigma**2)**2 - (2/sigma**2)*np.exp(-((x-0.5)/sigma)**2)
 
@@ -63,9 +63,9 @@ def initialize(N, dx, case):
 
 
 
-def euler_fwd(N_x, dx, T, dt, case):
+def euler_fwd(N_x, dx, T, dt, case, sigma = None):
 
-    psi_0, zeta_0 = initialize(N_x, dx, case)
+    psi_0, zeta_0 = initialize(N_x, dx, case, sigma)
     alpha = dt/(2.0*dx)
     dx2 = dx**2
     bc_0 = 0.0
@@ -114,8 +114,8 @@ def euler_fwd(N_x, dx, T, dt, case):
     return out_data
 
 
-def center(N_x, dx, T, dt, case):
-    psi_0, zeta_0 = initialize(N_x, dx, case)
+def center(N_x, dx, T, dt, case, sigma = None):
+    psi_0, zeta_0 = initialize(N_x, dx, case, sigma)
     alpha = dt/(2*dx)
     dx2 = dx**2
     bc_0 = 0.0
@@ -222,38 +222,63 @@ if __name__ == "__main__":
     x = np.linspace(0,L,N)
     t = psi_center_sine[0,:400]
 
-    anim = animate_wave(x, t, psi_center_sine[1:,:400].transpose())
-    plt.show()
-#    psi_center_gauss = center(N, dx, T, dt, 'gauss')
+#    anim = animate_wave(x, t, psi_center_sine[1:,:400].transpose())
+#    plt.show()
+    psi_center_sine = center(N, dx, T, dt, 'sine')
+    psi_center_gauss = center(N, dx, T, dt, 'gauss', sigma = 0.1)
+    psi_center_gauss_25 = center(N, dx, T, dt, 'gauss', sigma = 0.25)
+    psi_center_gauss_50 = center(N, dx, T, dt, 'gauss', sigma = 0.5)
 ##
 ##
 ##    
-#    x = np.linspace(0,L,N)
-#    t = psi_center_sine[0,:400]
-#    
-#    
-#    plt.figure(1)
-#    plt.style.use("ggplot")
-#    fig = plt.figure(figsize = (9,7))
-#    CS = plt.contourf(x, t, psi_center_sine[1:, :400].transpose(), 20, cmap = plt.cm.RdBu_r)
-#    plt.colorbar(CS, orientation = "vertical")
-#    plt.xlabel('x', fontsize = 13)
-#    plt.ylabel('time, t', fontsize = 13)
-#    plt.title(r'Hovmüller diagram of $\psi(x, t)$')
-#    
-#    plt.figure(2)
-#    plt.style.use("ggplot")
-#    fig = plt.figure(figsize = (9,7))
-#    CS = plt.contourf(x, t, psi_center_gauss[1:, :400].transpose(), 20, cmap = plt.cm.RdBu_r)
-#    plt.colorbar(CS, orientation = "vertical")
-#    plt.xlabel('x', fontsize = 13)
-#    plt.ylabel('time, t', fontsize = 13)
-#    plt.title(r'Hovmüller diagram of $\psi(x, t)$')
-        
+    x = np.linspace(0,L,N)
+    t = psi_center_sine[0,:400]
+    
+    
+    plt.figure(1, figsize = (8, 10))
+    plt.subplot(221)
+    plt.style.use("ggplot")
+    #fig = plt.figure(figsize = (9,7))
+    CS = plt.contourf(x, t, psi_center_sine[1:, :400].transpose(), 20, cmap = plt.cm.coolwarm)
+    plt.colorbar(CS, orientation = "horizontal")
+    plt.xlabel('x', fontsize = 13)
+    plt.ylabel('time, t', fontsize = 13)
+    plt.title(r'$\psi(x, t)$ sine wave', fontsize = 12)
+    
+    
+    plt.subplot(222)
+    plt.style.use("ggplot")
+    #fig = plt.figure(figsize = (9,7))
+    CS = plt.contourf(x, t, psi_center_gauss[1:, :400].transpose(), 20, cmap = plt.cm.coolwarm)
+    plt.colorbar(CS, orientation = "horizontal")
+    plt.xlabel('x', fontsize = 13)
+    #plt.ylabel('time, t', fontsize = 13)
+    plt.title(r'$\psi(x, t)$ gaussian wave $\sigma=0.1$', fontsize=12)
+    
+    plt.subplot(223)
+    plt.style.use("ggplot")
+    #fig = plt.figure(figsize = (9,7))
+    CS = plt.contourf(x, t, psi_center_gauss_25[1:, :400].transpose(), 20, cmap = plt.cm.coolwarm)
+    plt.colorbar(CS, orientation = "horizontal")
+    plt.xlabel('x', fontsize = 13)
+    plt.ylabel('time, t', fontsize = 13)
+    plt.title(r'$\psi(x, t)$ gaussian wave $\sigma=0.25$', fontsize=12)
+    
+    plt.subplot(224)
+    plt.style.use("ggplot")
+    #fig = plt.figure(figsize = (9,7))
+    CS = plt.contourf(x, t, psi_center_gauss_50[1:, :400].transpose(), 20, cmap = plt.cm.coolwarm)
+    plt.colorbar(CS, orientation = "horizontal")
+    plt.xlabel('x', fontsize = 13)
+    #plt.ylabel('time, t', fontsize = 13)
+    plt.title(r'$\psi(x, t)$ gaussian wave $\sigma=0.5$', fontsize=12)
+    
+    plt.savefig('figs/boundary_1D_hovmuller.pdf', bbox_inches = 'tight')
+    plt.show()
     
 
-
-    
+#
+#    
 #    psi_center = center(N, dx, T, dt, 'sine')
 #    psi_euler= euler_fwd(N, dx, T, dt, 'sine')
 #
@@ -314,28 +339,29 @@ if __name__ == "__main__":
 #    plt.title(r'$\Delta t = {:.1f}$'\
 #              .format(dt4), fontsize = 15)
 #    plt.xlabel('x', fontsize = 12)
+#    plt.grid()
 ##    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-##    plt.savefig('figs/subplots_boundary1D.pdf')
-
-
-
-#    plt.figure(1)
-#    plt.plot(x, psi_euler[:-1,0], 'r-', label = 'Euler')
-#    plt.plot(x, psi_center[:-1,0], 'b-.', label = 'Centered')
-#    plt.legend()
-#    plt.title(r'Streamfunction $\psi(x, t)$ at $t = {}$ with $\Delta t = {:.3f}$'\
-#              .format(T, dt), fontsize = 15)
-#    plt.xlabel('x', fontsize = 12)
-#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-##    plt.savefig('figs/boundary_T{}_dt{}.pdf'.format(T, str(dt)), bbox_inches = 'tight')
-#    plt.show()
-
-
-
-
-
+#    
+#    plt.savefig('figs/subplots_boundary1D.pdf')
+#
+#
+##
+##    plt.figure(1)
+##    plt.plot(x, psi_euler[:-1,0], 'r-', label = 'Euler')
+##    plt.plot(x, psi_center[:-1,0], 'b-.', label = 'Centered')
+##    plt.legend()
+##    plt.title(r'Streamfunction $\psi(x, t)$ at $t = {}$ with $\Delta t = {:.3f}$'\
+##              .format(T, dt), fontsize = 15)
+##    plt.xlabel('x', fontsize = 12)
+##    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+##    plt.grid()
+###    plt.savefig('figs/boundary_T{}_dt{}.pdf'.format(T, str(dt)), bbox_inches = 'tight')
+##    plt.show()
+##
+##
+#
+#
+#
 
 
 
