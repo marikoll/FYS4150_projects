@@ -1,8 +1,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import linalg
-
+from scipy.sparse import linalg
+import sys, os
 
 def periodic_matrix(n_rows, n_cols):
     A = np.zeros((n_rows, n_cols))
@@ -56,8 +56,7 @@ def center(N_x,N_y, dx,dy, T, dt, case):
     zeta_pp = np.zeros(multi)
     zeta_curr = np.zeros(multi)
     
-    rhs_poisson = np.zeros(multi-1)
-    A = periodic_matrix(multi-1, multi-1)
+
 
     for i in range(0,N_x):
         for j in range(0,N_y):
@@ -97,10 +96,13 @@ def center(N_x,N_y, dx,dy, T, dt, case):
             gamma*(psi_prev[1*N_y + j] - psi_prev[(N_x -2)*N_y + j])
             zeta_curr[(N_x-1)*N_y + j] = zeta_curr[0*N_y + j]
 
-        for i in range(0, N_x-1):
-            rhs_poisson[i] = -dx2*zeta_curr[i]
-
-        psi_curr = linalg.solve(A, rhs_poisson)
+        rhs_poisson = dx2*zeta_curr[1:-1]
+        
+        A = periodic_matrix(int(N_x*N_y-2),int(N_x*N_y-2))
+        sys.stdout = open(os.devnull, "w")
+        psi_curr[1:-1],istop, itn, normr, normar, norma, conda, normx, bla, bkabla = linalg.lsqr(A, rhs_poisson)
+        sys.stdout = sys.__stdout__
+            
         #poisson_jacobi_periodic(zeta_curr, dx, dt, N_x. N_y, 50, psi_curr)
 
         for i in range(0, N_x-1):

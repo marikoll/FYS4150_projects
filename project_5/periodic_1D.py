@@ -8,9 +8,8 @@ Created on Mon Dec  3 15:22:26 2018
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import linalg
-
-
+from scipy.sparse import linalg
+import sys, os
 
 
 def periodic_matrix(n_rows, n_cols):
@@ -18,11 +17,11 @@ def periodic_matrix(n_rows, n_cols):
     for i in range(n_rows):
         for j in range(n_cols):
             if i == j:
-                A[i, j] = 2.0
+                A[i, j] = -2.0
             elif abs(i-j) ==1:
-                A[i,j] = -1.0
-    A[0, n_cols-1] = -1.0
-    A[n_rows -1, 0] = -1.0
+                A[i,j] = 1.0
+    A[0, n_cols-1] = 1.0
+    A[n_rows -1, 0] = 1.0
     
     return A
 
@@ -76,12 +75,15 @@ def euler_fwd(N_x, dx, T, dt, case):
         zeta_curr[0] = zeta_prev[0] - alpha*(psi_prev[1] - psi_prev[-2])
         zeta_curr[-1] = zeta_curr[0]
     
-        rhs_poisson = -dx2*zeta_curr[1:-1]
+        rhs_poisson = dx2*zeta_curr[1:-1]
             
         A = periodic_matrix(int(N_x-2),int(N_x-2))
         
-        psi_curr[1:-1] = np.linalg.solve(A, rhs_poisson)
-    
+#        psi_curr[1:-1] = np.linalg.solve(A, rhs_poisson)
+        sys.stdout = open(os.devnull, "w")
+        psi_curr[1:-1],istop, itn, normr, normar, norma, conda, normx, bla, bkabla = linalg.lsqr(A, rhs_poisson)
+        sys.stdout = sys.__stdout__
+            
         
         psi_curr[-1] = psi_curr[0]
         
@@ -146,11 +148,13 @@ def center(N_x, dx, T, dt, case):
         zeta_curr[-1] = zeta_curr[0]
         
 
-        rhs_poisson = -dx2*zeta_curr[1:-1]
+        rhs_poisson = dx2*zeta_curr[1:-1]
         
         A = periodic_matrix(int(N_x-2),int(N_x-2))
-        psi_curr[1:-1] = np.linalg.solve(A, rhs_poisson)
-
+        sys.stdout = open(os.devnull, "w")
+        psi_curr[1:-1],istop, itn, normr, normar, norma, conda, normx, bla, bkabla = linalg.lsqr(A, rhs_poisson)
+        sys.stdout = sys.__stdout__
+            
         psi_curr[-1] = psi_curr[0]
         
         
@@ -183,7 +187,7 @@ if __name__ == "__main__":
     
 
 
-    psi_center_sine = euler_fwd(N, dx, T, dt, case = 'sine')
+    psi_center_sine = center(N, dx, T, dt, case = 'sine')
 #    psi_center_gauss = euler_fwd(N, dx, T, dt, case = 'gauss')
     
 ##    psi_center_sine = psi_center_sine[:,0::20]

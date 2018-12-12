@@ -9,15 +9,17 @@ Created on Tue Dec 11 09:05:04 2018
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse import linalg
+import sys, os
 
 
-def initialize(N, dx):
+def initialize(N, dx, dt):
     psi_0 = np.zeros(N)
     zeta_0 = np.zeros(N)
     for i in range(0, N):
         x = i*dx
-        psi_0[i] = np.sin(4*np.pi*x)
-        zeta_0[i] = -16*np.pi**2*np.sin(4*np.pi*x)
+        t = i*dt
+        psi_0[i] = np.sin(np.pi*x)*np.cos(np.pi*x + t/np.pi)
+        zeta_0[i] = -2*np.pi**2*(np.sin(np.pi*x)*np.cos(np.pi*x + t/np.pi) + np.cos(np.pi*x)*np.sin(np.pi*x + t/np.pi))
     return psi_0, zeta_0
 
 def tridiag(psi, d, N): 
@@ -53,7 +55,7 @@ def periodic_matrix(n_rows, n_cols):
 def forward_euler_basin(N, dx, T, dt):
     alpha = dt/(2*dx)
     dx2 = dx**2
-    psi_0, zeta_0 = initialize(N, dx)
+    psi_0, zeta_0 = initialize(N, dx, dt)
     
     psi = psi_0
     zeta = zeta_0
@@ -76,7 +78,7 @@ def forward_euler_basin(N, dx, T, dt):
 def forward_euler_periodic(N, dx, T, dt):
     alpha = dt/(2*dx)
     dx2 = dx**2
-    psi_0, zeta_0 = initialize(N, dx)
+    psi_0, zeta_0 = initialize(N, dx, dt)
     
     psi = psi_0
     zeta = zeta_0
@@ -94,7 +96,10 @@ def forward_euler_periodic(N, dx, T, dt):
             zeta[i+1] = zeta[i] -alpha*(psi[i-1] - psi[i+1])
             A = periodic_matrix(int(N-2),int(N-2))
             #print(len(psi[1:-1]), len(-zeta[1:-1]*dx2))
+            sys.stdout = open(os.devnull, "w")
             psi[1:-1],istop, itn, normr, normar, norma, conda, normx, bla, bkabla = linalg.lsqr(A, -zeta[1:-1]*dx2)
+            sys.stdout = sys.__stdout__
+            
             out[1:, k+1] = psi
         zeta[0] = zeta_0[0] + alpha*(psi[N-2] - psi[1])
         zeta[-1] = zeta[0]
@@ -105,7 +110,7 @@ def centered_diff_basin(N, dx, T, dt):
     alpha = dt/(2*dx)
     gamma = dt/dx
     dx2 = dx**2
-    psi_0, zeta_0 = initialize(N, dx)
+    psi_0, zeta_0 = initialize(N, dx, dt)
     
     psi = psi_0
     zeta = zeta_0
@@ -137,7 +142,7 @@ def centered_diff_periodic(N, dx, T, dt):
     alpha = dt/(2*dx)
     gamma = dt/dx
     dx2 = dx**2
-    psi_0, zeta_0 = initialize(N, dx)
+    psi_0, zeta_0 = initialize(N, dx, dt)
     
     psi = psi_0
     zeta = zeta_0
@@ -161,8 +166,9 @@ def centered_diff_periodic(N, dx, T, dt):
         for i in range(1, N-1):
             zeta[i+1] = zeta[i] -gamma*(psi[i-1] - psi[i+1])
             A = periodic_matrix(int(N-2),int(N-2))
+            sys.stdout = open(os.devnull, "w")
             psi[1:-1],istop, itn, normr, normar, norma, conda, normx, bla, bkabla  = linalg.lsqr(A, -zeta[1:-1]*dx2)
-            
+            sys.stdout = sys.__stdout__
             out[1:, k+1] = psi
     return psi, zeta, out 
 
