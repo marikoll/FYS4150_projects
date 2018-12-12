@@ -22,7 +22,7 @@ def tridiag(psi, d, N):
     
     psi[N-1] = d[N-1]/a[N-1]
 
-    for i in range(N-2, 0, -1):
+    for i in range(N-2, -1, -1):
         psi[i] = (d[i]-b[i-1]*psi[i+1])/a[i]
 #    psi[-1] = 0.0
 #    psi[0] = 0.0   
@@ -168,6 +168,7 @@ def center(N_x, dx, T, dt, case):
         psi_prev = psi_curr
         zeta_pp = zeta_prev
         zeta_prev = zeta_curr
+        
         t += dt
         if (n % 20 == 0):
             out_data[0, n2] = t
@@ -224,9 +225,9 @@ if __name__ == "__main__":
     anim = animate_wave(x, t, psi_center_sine[1:,:400].transpose())
     plt.show()
 #    psi_center_gauss = center(N, dx, T, dt, 'gauss')
-#
-#
-#    
+##
+##
+##    
 #    x = np.linspace(0,L,N)
 #    t = psi_center_sine[0,:400]
 #    
