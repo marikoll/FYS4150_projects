@@ -186,7 +186,8 @@ if __name__ == "__main__":
     N = int(L/dx + 1)
     
 
-
+    psi_euler_sine = euler_fwd(N, dx, T, dt,case = 'sine')
+    
     psi_center_sine = center(N, dx, T, dt, case = 'sine')
     psi_center_gauss = center(N, dx, T, dt, case = 'gauss', sigma = 0.1)
     psi_center_gauss_25 = center(N, dx, T, dt, case = 'gauss', sigma = 0.25)
@@ -242,101 +243,76 @@ if __name__ == "__main__":
     #plt.savefig('figs/periodic_1D_hovmuller.pdf', bbox_inches = 'tight')
     
 #    
-#    plt.subplot(224)
-#    plt.style.use("ggplot")
-#    #fig = plt.figure(figsize = (9,7))
-#    CS = plt.contourf(x, t, psi_center_gauss_50[1:, :41].transpose(), 20, cmap = plt.cm.coolwarm)
-#    plt.colorbar(CS, orientation = "vertical")
-#    plt.xlabel('x', fontsize = 13)
-#    plt.ylabel('time, t', fontsize = 13)
-#    plt.title(r'Hovmüller diagram of $\psi(x, t)$')
-#    plt.show()
+
+  
+    psi_center = center(N, dx, T, dt, case = 'sine')
+
+    psi_euler= euler_fwd(N, dx, T, dt, case = 'sine')
+
+    dt2 = 0.01
     
-#    psi_center = center(N, dx, T, dt, case = 'sine')
-#
-#    psi_euler= euler_fwd(N, dx, T, dt, case = 'sine')
-#
-#    dt2 = 0.01
-#    
-#    psi_center2 = center(N, dx, T, dt2, case = 'sine')
-#    
-#    psi_euler2 = euler_fwd(N, dx, T, dt2, case = 'sine')
-#    
-#    dt3 = 0.2
-#    
-#    psi_center3 = center(N, dx, T, dt3, case = 'sine')
-#    
-#    psi_euler3 = euler_fwd(N, dx, T, dt3, case = 'sine')
-#    
-#    dt4 = 1.0
-#    
-#    psi_center4 = center(N, dx, T, dt4, case = 'sine')
-#    
-#    psi_euler4 = euler_fwd(N, dx, T, dt4, case = 'sine')
-#    
-#    x = np.linspace(0, 1, N)
-#
-#
-#    
-# 
-#
-#    plt.figure(2, figsize = (10, 8))
-#    plt.subplot(221)
-#    plt.plot(x, psi_euler[1:,1], 'r-', label = 'Euler')
-#    plt.plot(x, psi_center[1:,1], 'b-.', label = 'Centered')
-#    plt.legend()
-#    plt.title(r'$\Delta t = {:.3f}$'\
-#              .format(dt), fontsize = 15)
-##    plt.xlabel('x', fontsize = 12)
-#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-#    plt.subplot(222)
-#    plt.plot(x, psi_euler2[1:,1], 'r-', label = 'Euler')
-#    plt.plot(x, psi_center2[1:,1], 'b-.', label = 'Centered')
-#    plt.legend()
-#    plt.title(r'$\Delta t = {:.3f}$'\
-#              .format(dt2), fontsize = 15)
-##    plt.xlabel('x', fontsize = 12)
-##    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-#    plt.subplot(223)
-#    plt.plot(x, psi_euler3[1:,1], 'r-', label = 'Euler')
-#    plt.plot(x, psi_center3[1:,1], 'b-.', label = 'Centered')
-#    plt.legend()
-#    plt.title(r'$\Delta t = {:.2f}$'\
-#              .format(dt3), fontsize = 15)
-#    plt.xlabel('x', fontsize = 12)
-#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-#    plt.subplot(224)
-#    plt.plot(x, psi_euler4[1:,1], 'r-', label = 'Euler')
-#    plt.plot(x, psi_center4[1:,1], 'b-.', label = 'Centered')
-#    plt.legend()
-#    plt.title(r'$\Delta t = {:.1f}$'\
-#              .format(dt4), fontsize = 15)
-#    plt.xlabel('x', fontsize = 12)
-##    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-#    plt.savefig('figs/subplots_periodic1D.pdf')
+    psi_center2 = center(N, dx, T, dt2, case = 'sine')
+    
+    psi_euler2 = euler_fwd(N, dx, T, dt2, case = 'sine')
+    
+    dt3 = 0.2
+    
+    psi_center3 = center(N, dx, T, dt3, case = 'sine')
+    
+    psi_euler3 = euler_fwd(N, dx, T, dt3, case = 'sine')
+    
+    dt4 = 1.0
+    
+    psi_center4 = center(N, dx, T, dt4, case = 'sine')
+    
+    psi_euler4 = euler_fwd(N, dx, T, dt4, case = 'sine')
+    
+    x = np.linspace(0, 1, N)
+
+
+    
+ 
+
+    plt.figure(2, figsize = (10, 8))
+    plt.subplot(221)
+    plt.plot(x, psi_euler[1:,1], 'r-', label = 'Euler')
+    plt.plot(x, psi_center[1:,1], 'b-.', label = 'Centered')
+    plt.legend()
+    plt.title(r'$\Delta t = {:.3f}$'\
+              .format(dt), fontsize = 15)
+    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+    plt.grid()
+    plt.subplot(222)
+    plt.plot(x, psi_euler2[1:,1], 'r-', label = 'Euler')
+    plt.plot(x, psi_center2[1:,1], 'b-.', label = 'Centered')
+    plt.legend()
+    plt.title(r'$\Delta t = {:.3f}$'\
+              .format(dt2), fontsize = 15)
+
+    plt.grid()
+    plt.subplot(223)
+    plt.plot(x, psi_euler3[1:,1], 'r-', label = 'Euler')
+    plt.plot(x, psi_center3[1:,1], 'b-.', label = 'Centered')
+    plt.legend()
+    plt.title(r'$\Delta t = {:.2f}$'\
+              .format(dt3), fontsize = 15)
+    plt.xlabel('x', fontsize = 12)
+    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
+    plt.grid()
+    plt.subplot(224)
+    plt.plot(x, psi_euler4[1:,1], 'r-', label = 'Euler')
+    plt.plot(x, psi_center4[1:,1], 'b-.', label = 'Centered')
+    plt.legend()
+    plt.title(r'$\Delta t = {:.1f}$'\
+              .format(dt4), fontsize = 15)
+    plt.xlabel('x', fontsize = 12)
+    plt.grid()
+  
+    plt.savefig('figs/subplots_periodic1D.pdf')
 
 
 
 
-
-#   
-#    outstuff = euler_fwd(N, dx, T, dt, case = 'sine')
-#    outstuff2 = center(N, dx, T, dt, case = 'sine')
-#    plt.figure()
-#    plt.plot(outstuff, 'r-', label = 'Euler')
-#    plt.plot(outstuff2[1:,1], 'b-.', label = 'Centered')
-#    plt.legend()
-#    plt.title(r'Streamfunction $\psi(x, t)$ at $t = {}$ with $\Delta t = {:.3f}$'\
-#          .format(T, dt), fontsize = 15)
-#    plt.xlabel('x', fontsize = 12)
-#    plt.ylabel(r'$\psi(x,t)$', fontsize = 12)
-#    plt.grid()
-
-        
         
         
         

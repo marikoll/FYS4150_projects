@@ -209,7 +209,7 @@ def animate_wave(x, t, psi):
 
 if __name__ == "__main__":
 
-    T = 400
+    T = 200
     dt = 0.01
 
     dx = 1.0/40
@@ -228,9 +228,7 @@ if __name__ == "__main__":
     psi_center_gauss = center(N, dx, T, dt, 'gauss', sigma = 0.1)
     psi_center_gauss_25 = center(N, dx, T, dt, 'gauss', sigma = 0.25)
     psi_center_gauss_50 = center(N, dx, T, dt, 'gauss', sigma = 0.5)
-##
-##
-##    
+   
     x = np.linspace(0,L,N)
     t = psi_center_sine[0,:400]
     
@@ -238,7 +236,6 @@ if __name__ == "__main__":
     plt.figure(1, figsize = (8, 10))
     plt.subplot(221)
     plt.style.use("ggplot")
-    #fig = plt.figure(figsize = (9,7))
     CS = plt.contourf(x, t, psi_center_sine[1:, :400].transpose(), 20, cmap = plt.cm.coolwarm)
     plt.colorbar(CS, orientation = "horizontal")
     plt.xlabel('x', fontsize = 13)
@@ -248,16 +245,13 @@ if __name__ == "__main__":
     
     plt.subplot(222)
     plt.style.use("ggplot")
-    #fig = plt.figure(figsize = (9,7))
     CS = plt.contourf(x, t, psi_center_gauss[1:, :400].transpose(), 20, cmap = plt.cm.coolwarm)
     plt.colorbar(CS, orientation = "horizontal")
     plt.xlabel('x', fontsize = 13)
-    #plt.ylabel('time, t', fontsize = 13)
     plt.title(r'$\psi(x, t)$ gaussian wave $\sigma=0.1$', fontsize=12)
     
     plt.subplot(223)
     plt.style.use("ggplot")
-    #fig = plt.figure(figsize = (9,7))
     CS = plt.contourf(x, t, psi_center_gauss_25[1:, :400].transpose(), 20, cmap = plt.cm.coolwarm)
     plt.colorbar(CS, orientation = "horizontal")
     plt.xlabel('x', fontsize = 13)
@@ -266,11 +260,9 @@ if __name__ == "__main__":
     
     plt.subplot(224)
     plt.style.use("ggplot")
-    #fig = plt.figure(figsize = (9,7))
     CS = plt.contourf(x, t, psi_center_gauss_50[1:, :400].transpose(), 20, cmap = plt.cm.coolwarm)
     plt.colorbar(CS, orientation = "horizontal")
     plt.xlabel('x', fontsize = 13)
-    #plt.ylabel('time, t', fontsize = 13)
     plt.title(r'$\psi(x, t)$ gaussian wave $\sigma=0.5$', fontsize=12)
     
     plt.savefig('figs/boundary_1D_hovmuller.pdf', bbox_inches = 'tight')
