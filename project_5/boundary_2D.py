@@ -38,7 +38,7 @@ def leapfrog(N_x, N_y, dy, dx, T, dt, case):
     """
     Function to use for time stepping using leapfrog (centered difference) to solve the PDE
     in question. Boundary conditions are set in order to have to flow into the walls.
-    Uses functions initialize and tridiag in order to solve the PDE in question.
+    Uses functions initialize and poisson_jacobi in order to solve the PDE in question.
 
 
     Input:
